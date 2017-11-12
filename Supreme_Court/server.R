@@ -25,42 +25,23 @@ colnames(decisions) <- c("topic", "case", "argued", "decided", "opinion")
 library(rvest)
 library(dplyr)
 library(readr)
+library(stringr)
 
 cornell_url <- "https://www.law.cornell.edu/supct/cases/topic.htm"
-topic_links <- c("Abortion", "Affirmative Action", "Aliens", "Armed Services", "Attainder", "Attorneys", "Bankruptcy",
-                 "Bill of Rights", "Birth Control", "Borders", "Capital Punishment", "Censorship", "Children",
-                 "Choice of Law", "Citizenship", "Civil Rights", "Commander in Chief", "Commerce Clause", 
-                 "Commercial Speech", "Communism", "Confessions", "Conflict of Laws", "Congress", "Contract Clause", 
-                 "Courts", "Criminal Law", "Criminal Procedure", "Cruel and Unusual Punishment", "Damages",
-                 "Discrimination", "Discrimination Based on Nationality", "Double Jeopardy", "Due Process", "Education",
-                 "Eighth Amendment", "Elections", "Eleventh Amendment", "Eminent Domain", "Employment", "Environment",
-                 "Equal Protection", "Establishment of Religion", "Evidence", "Executive Power", "Executive Privilege",
-                 "Extradition", "Federal Courts", "Federalism", "Fifth Amendment", "Fighting Words", "First Amendment",
-                 "Flag Desecration", "Foreign Affairs", "Forum", "Fourteenth Amendment", "Fourth Amendment", 
-                 "Freedom of Assembly", "Freedom of Association", "Freedom of Religion", "Freedom of Speech",
-                 "Freedom of the Press", "Full Faith and Credit", "Gender", "Government Employment", "Habeas Corpus",
-                 "Handicapped", "Housing", "Immunity", "Implied Powers", "Import Tariffs", "Incorporation", "Indians",
-                 "Insanity", "International Law", "International Relations", "Internet", "Investigations", 
-                 "Involuntary Servitude", "Judicial Review", "Jurisdiction", "Jury", "Justiciability", "Juveniles",
-                 "Labor", "Legislative Policy", "Libel", "Marriage", "Mental Health", "Mental Retardation", 
-                 "Minimum Contacts", "Monopoly", "National Power", "National Security", "Necessary and Proper", "New Deal",
-                 "Ninth Amendment", "Obscenity", "Pardon", "Pensions", "Pledge of Loyalty", "Police Power",
-                 "Political Questions", "Political Speech", "Power to Tax and Spend", "Precedent", "Presidency", "Prisons",
-                 "Privacy", "Privileges and Immunities", "Property", "Race", "Racial Discrimination", "Reapportionment",
-                 "Regulation", "Removal Power", "Reproduction", "Res Judicata", "Right to a Hearing", "Right to Bear Arms",
-                 "Right to Confront Witnesses", "Right to Counsel", "Right to Travel", "Searches and Seizures", 
-                 "Second Amendment", "Sedition", "Segregation", "Self-Incrimination", "Separation of Power",
-                 "Sex Discrimination", "Sexuality", "Sixth Amendment", "Slavery", "Social Security", "Standing", 
-                 "State Action", "States", "Sterilization", "Supremacy Clause", "Symbolic Speech", "Takings Clause",
-                 "Taxation", "Tenth Amendment", "Testimony", "Thirteenth Amendment", "Trial by Jury", "Veto", "Voting",
-                 "War Powers", "Welfare Benefits", "Wiretapping", "Witnesses")
+cornell_html <- paste(readLines(cornell_url), collapse="\n")
+cornell_links <- str_match_all(cornell_html, "<a href=\"(.*?)\"")
+
+topics_url <- as.character()
+for (i in 1:151){ 
+  topics_url[i] <- paste("https://www.law.cornell.edu", cornell_links[[1]][[48+i,2]], sep="")
+}
 
 cases <- read_csv("Supreme Court Decisions.csv")
 
 decisions$topic <- cases$Topic
 
 # TOPIC: ABORTION #
-# Note: A different website had to be used for Roe vs. Wade and Hodgson vs. Minnesota, as the syllabus appears to have been removed from the Cornell site
+# Note: A different website had to be used for Roe vs. Wade and Hodgson vs. Minnesota, as the syllabus was missing from the Cornell site
 abortion_links <- c("Doe v. Bolton 410 u.s. 179 (1973)", "Bigelow v. Virginia 421 u.s. 809 (1975)",
                     "Planned Parenthood of Central Missouri v. Danforth 428 u.s. 52 (1976)",
                     "Beal v. Doe 432 u.s. 438 (1977)", "Maher v. Roe 432 u.s. 464 (1977)",
@@ -72,32 +53,28 @@ abortion_links <- c("Doe v. Bolton 410 u.s. 179 (1973)", "Bigelow v. Virginia 42
                     "Planned Parenthood of Southeastern Pennsylvania v. Casey 505 u.s. 833 (1992)")
 
 for (i in 1:length(abortion_links)){
-  decisions$case[i] <- html_session(cornell_url) %>%
-    follow_link(topic_links[1]) %>%
+  decisions$case[i] <- html_session(topics_url[1]) %>%
     follow_link(abortion_links[i]) %>%
     html_node('#page-title') %>% 
     html_text()
 }
 
 for (i in 1:length(abortion_links)){
-  decisions$argued[i] <- html_session(cornell_url) %>%
-    follow_link(topic_links[1]) %>%
+  decisions$argued[i] <- html_session(topics_url[1]) %>%
     follow_link(abortion_links[i]) %>%
     html_node('.toccaption:nth-child(5) b') %>% 
     html_text()
 }
 
 for (i in 1:length(abortion_links)){
-  decisions$decided[i] <- html_session(cornell_url) %>%
-    follow_link(topic_links[1]) %>%
+  decisions$decided[i] <- html_session(topics_url[1]) %>%
     follow_link(abortion_links[i]) %>%
     html_node('.toccaption:nth-child(6) b') %>% 
     html_text()
 }
 
 for (i in 1:length(abortion_links)){
-  decisions$opinion[i] <- html_session(cornell_url) %>%
-    follow_link(topic_links[1]) %>%
+  decisions$opinion[i] <- html_session(topics_url[1]) %>%
     follow_link(abortion_links[i]) %>%
     html_node('#block-supremecourt-text li+ li') %>% 
     html_text()
@@ -119,18 +96,66 @@ decisions$opinion[14] <- roeVwade %>% html_node("p:nth-child(29)") %>% html_text
 decisions$opinion[15] <- hodgsonVminnesota %>% html_node("p:nth-child(29)") %>% html_text()
 
 
+# TOPIC: AFFIRMATIVE ACTION #
+# Note: A different website had to be used for Wygant vs. Jackson Board of Education, United States vs. Paradise, and City of Richmond vs. J.A. Croson Co., as the syllabus was missing from the Cornell site
+affirmative_action_links <- c("Regents of the Univ. of Cal. v. Bakke 438 u.s. 265 (1978)",
+                              "United Steelworkers of America, AFL-CIO-CLC v. Weber 443 u.s. 193 (1979)",
+                              "Fullilove v. Klutznick 448 u.s. 448 (1980)",
+                              "Mississippi University for Women v. Hogan 458 u.s. 718 (1982)",
+                              "Building Trades & Construction Trades Council of Camden County and Vicinity v. Mayor and Council of the City of Camden 465 u.s. 208 (1984)",
+                              "Firefighters Local Union No. 1784 v. Stotts 467 u.s. 561 (1984)",
+                              "Johnson v. Transportation Agency 480 u.s. 616 (1987)",
+                              "Metro Broadcasting, Inc. v. Federal Communications Commission 497 u.s. 547 (1990)",
+                              "Adarand Constructors, Inc. v. Pena 515 u.s. 200 (1995)")
 
+for (i in 1:length(affirmative_action_links)){
+  decisions$case[i+15] <- html_session(topics_url[2]) %>%
+    follow_link(affirmative_action_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
 
+for (i in 1:length(affirmative_action_links)){
+  decisions$argued[i+15] <- html_session(topics_url[2]) %>%
+    follow_link(affirmative_action_links[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
 
+for (i in 1:length(affirmative_action_links)){
+  decisions$decided[i+15] <- html_session(topics_url[2]) %>%
+    follow_link(affirmative_action_links[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
 
+for (i in 1:length(affirmative_action_links)){
+  decisions$opinion[i+15] <- html_session(topics_url[2]) %>%
+    follow_link(affirmative_action_links[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
 
+wygantVjbe <- read_html("https://supreme.justia.com/cases/federal/us/476/267/")
+usVparadise <- read_html("https://supreme.justia.com/cases/federal/us/480/149/")
+corVjacc <- read_html("https://supreme.justia.com/cases/federal/us/488/469/")
 
+decisions$case[25] <- wygantVjbe %>% html_node("h3+ p b") %>% html_text()
+decisions$case[26] <- usVparadise %>% html_node("h3+ p") %>% html_text()
+decisions$case[27] <- corVjacc %>% html_node("h3+ p b") %>% html_text()
 
+decisions$argued[25] <- wygantVjbe %>% html_node("p:nth-child(5) b") %>% html_text()
+decisions$argued[26] <- usVparadise %>% html_node("p:nth-child(5) b") %>% html_text()
+decisions$argued[27] <- corVjacc %>% html_node("p:nth-child(5) b") %>% html_text()
 
+decisions$decided[25] <- wygantVjbe %>% html_node("p:nth-child(6) b") %>% html_text()
+decisions$decided[26] <- usVparadise %>% html_node("p:nth-child(6) b") %>% html_text()
+decisions$decided[27] <- corVjacc %>% html_node("p:nth-child(6) b") %>% html_text()
 
+decisions$opinion[25] <- wygantVjbe %>% html_node("p:nth-child(22)") %>% html_text()
+decisions$opinion[27] <- corVjacc %>% html_node("p:nth-child(44)") %>% html_text()
 
-
-
+# TOPIC: ALIENS #
 
 
 
