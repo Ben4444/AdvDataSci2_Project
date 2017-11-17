@@ -6,7 +6,8 @@
 #
 
 # Loading in Supreme Court nominee data, obtained from http://epstein.wustl.edu/research/justicesdata.html
-load("justicesdata.rdata.txt")
+justicesdata <- read.csv("http://epstein.wustl.edu/research/justicesdata.csv")
+#load("justicesdata.rdata.txt")
 
 # Cutting the Supreme Court nominee data down to the variables of interest
 justices <- subset(justicesdata, select=c("name", "yrnom", "posit", "recess", "success", "id", "analu", "birthcit",
@@ -16,7 +17,7 @@ justices <- subset(justicesdata, select=c("name", "yrnom", "posit", "recess", "s
                                           "percrim", "ncrim", "percr", "ncr", "perfir", "nfir", "perunn", "nunn", "perecon",
                                           "necon", "perfed", "nfed", "perftax", "nftax", "datesere", "reasdep", "deathd"))
 
-# Subsetting the Supreme Court nominee data down to people who actually served on the court
+# Subsetting the Supreme Court nominee data down to people who actually served on the court (1 = Nominee confirmed and served, 777 = reccess appointment)
 justices <- subset(justices, serve == 1 | serve == 777)
 
 # Scraping data from the Cornell Law page, looking at Historic Supreme Court Decisions - by Topic, https://www.law.cornell.edu/supct/cases/topic.htm
@@ -29,12 +30,8 @@ library(stringr)
 
 cornell_url <- "https://www.law.cornell.edu/supct/cases/topic.htm"
 cornell_html <- paste(readLines(cornell_url), collapse="\n")
-cornell_links <- str_match_all(cornell_html, "<a href=\"(.*?)\"")
-
-topics_url <- as.character()
-for (i in 1:151){ 
-  topics_url[i] <- paste("https://www.law.cornell.edu", cornell_links[[1]][[48+i,2]], sep="")
-}
+cornell_links <- str_match_all(cornell_html, "<a href=\"/supct/cases/topics/(.*?)\"")
+topics_url <- paste0("https://www.law.cornell.edu/supct/cases/topics/", cornell_links[[1]][,2])
 
 cases <- read_csv("Supreme Court Decisions.csv")
 
