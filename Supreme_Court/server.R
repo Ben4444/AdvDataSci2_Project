@@ -21,7 +21,7 @@ justices <- subset(justicesdata, select=c("name", "yrnom", "posit", "recess", "s
 justices <- subset(justices, serve == 1 | serve == 777)
 
 # Scraping data from the Cornell Law page, looking at Historic Supreme Court Decisions - by Topic, https://www.law.cornell.edu/supct/cases/topic.htm
-decisions <- data.frame(matrix(ncol = 5, nrow = 2531))
+decisions <- data.frame(matrix(ncol = 5, nrow = 2530))
 colnames(decisions) <- c("topic", "case", "argued", "decided", "opinion")
 library(rvest)
 library(dplyr)
