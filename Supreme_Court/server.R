@@ -1,4 +1,3 @@
-
 # This is the server logic for a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -32,10 +31,13 @@ cornell_url <- "https://www.law.cornell.edu/supct/cases/topic.htm"
 cornell_html <- paste(readLines(cornell_url), collapse="\n")
 cornell_links <- str_match_all(cornell_html, "<a href=\"/supct/cases/topics/(.*?)\"")
 topics_url <- paste0("https://www.law.cornell.edu/supct/cases/topics/", cornell_links[[1]][,2])
+topics <- cornell_links[[1]][,2]
+topics <- unlist(strsplit(topics, split='tog_', fixed=TRUE))
+toDelete <- seq(1, length(topics), 2)
+topics <-  topics[-toDelete]
+topics <- unlist(strsplit(topics, split='.html', fixed=TRUE))
 
 cases <- read_csv("Supreme Court Decisions.csv")
-
-decisions$topic <- cases$Topic
 
 # TOPIC: ABORTION #
 # Note: A different website had to be used for Roe vs. Wade and Hodgson vs. Minnesota, as the syllabus was missing from the Cornell site
@@ -48,6 +50,10 @@ abortion_links <- c("Doe v. Bolton 410 u.s. 179 (1973)", "Bigelow v. Virginia 42
                     "Frisby v. Schultz 487 u.s. 474 (1988)", "Webster v. Reproductive Health Services 492 u.s. 490 (1989)",
                     "Rust v. Sullivan 500 u.s. 173 (1991)",
                     "Planned Parenthood of Southeastern Pennsylvania v. Casey 505 u.s. 833 (1992)")
+
+for (i in 1:length(abortion_links)){
+  decisions$topic[i] <- topics[1]
+}
 
 for (i in 1:length(abortion_links)){
   decisions$case[i] <- html_session(topics_url[1]) %>%
@@ -80,6 +86,9 @@ for (i in 1:length(abortion_links)){
 roeVwade <- read_html("https://supreme.justia.com/cases/federal/us/410/113/")
 hodgsonVminnesota <- read_html("https://supreme.justia.com/cases/federal/us/497/417/")
 
+decisions$topic[14] <- topics[1]
+decisions$topic[15] <- topics[1]
+
 decisions$case[14] <- roeVwade %>% html_node("h3+ p b") %>% html_text()
 decisions$case[15] <- hodgsonVminnesota %>% html_node("h3+ p b") %>% html_text()
 
@@ -104,6 +113,10 @@ affirmative_action_links <- c("Regents of the Univ. of Cal. v. Bakke 438 u.s. 26
                               "Johnson v. Transportation Agency 480 u.s. 616 (1987)",
                               "Metro Broadcasting, Inc. v. Federal Communications Commission 497 u.s. 547 (1990)",
                               "Adarand Constructors, Inc. v. Pena 515 u.s. 200 (1995)")
+
+for (i in 1:length(affirmative_action_links)){
+  decisions$topic[i+15] <- topics[2]
+}
 
 for (i in 1:length(affirmative_action_links)){
   decisions$case[i+15] <- html_session(topics_url[2]) %>%
@@ -136,6 +149,10 @@ for (i in 1:length(affirmative_action_links)){
 wygantVjbe <- read_html("https://supreme.justia.com/cases/federal/us/476/267/")
 usVparadise <- read_html("https://supreme.justia.com/cases/federal/us/480/149/")
 corVjacc <- read_html("https://supreme.justia.com/cases/federal/us/488/469/")
+
+decisions$topic[25] <- topics[2]
+decisions$topic[26] <- topics[2]
+decisions$topic[27] <- topics[2]
 
 decisions$case[25] <- wygantVjbe %>% html_node("h3+ p b") %>% html_text()
 decisions$case[26] <- usVparadise %>% html_node("h3+ p") %>% html_text()
