@@ -37,7 +37,7 @@ toDelete <- seq(1, length(topics), 2)
 topics <-  topics[-toDelete]
 topics <- unlist(strsplit(topics, split='.html', fixed=TRUE))
 
-cases <- read_csv("Supreme Court Decisions.csv")
+cases <- read.csv("Supreme Court Decisions.csv")
 
 # TOPIC: ABORTION #
 # Note: A different website had to be used for Roe vs. Wade and Hodgson vs. Minnesota, as the syllabus was missing from the Cornell site
@@ -170,6 +170,114 @@ decisions$opinion[25] <- wygantVjbe %>% html_node("p:nth-child(22)") %>% html_te
 decisions$opinion[27] <- corVjacc %>% html_node("p:nth-child(44)") %>% html_text()
 
 # TOPIC: ALIENS #
+# Note: A different website had to be used for Graham vs. Dept. of Public Welfare, as the syllabus was missing from the Cornell site
+aliens_links <- c("Truax v. Raich 239 u.s. 33 (1915)",
+                  "United States v. Pink 315 u.s. 203 (1942)",
+                  "Hampton v. Mow Sun Wong 426 u.s. 88 (1976)",
+                  "Ambach v. Norwick 441 u.s. 68 (1979)",
+                  "Fullilove v. Klutznick 448 u.s. 448 (1980)",
+                  "Cabell v. Chavez-Salido 454 u.s. 432 (1982)",
+                  "Plyler v. Doe 457 u.s. 202 (1982)",
+                  "INS v. Chadha 462 u.s. 919 (1983)")
+
+for (i in 1:length(aliens_links)){
+  decisions$topic[i+27] <- topics[3]
+}
+
+for (i in 1:length(aliens_links)){
+  decisions$case[i+27] <- html_session(topics_url[3]) %>%
+    follow_link(aliens_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(aliens_links)){
+  decisions$argued[i+27] <- html_session(topics_url[3]) %>%
+    follow_link(aliens_links[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(aliens_links)){
+  decisions$decided[i+27] <- html_session(topics_url[3]) %>%
+    follow_link(aliens_links[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(aliens_links)){
+  decisions$opinion[i+27] <- html_session(topics_url[3]) %>%
+    follow_link(aliens_links[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
+
+grahamVdpw <- read_html("https://supreme.justia.com/cases/federal/us/403/365/")
+
+decisions$topic[36] <- topics[3]
+
+decisions$case[36] <- grahamVdpw %>% html_node("h3+ p b") %>% html_text()
+
+decisions$argued[36] <- grahamVdpw %>% html_node("p:nth-child(5) b") %>% html_text()
+
+decisions$decided[36] <- grahamVdpw %>% html_node("p:nth-child(6) b") %>% html_text()
+
+decisions$opinion[36] <- grahamVdpw %>% html_node("p:nth-child(12)") %>% html_text()
+
+# TOPIC: ARMED SERVICES #
+# Note: A different website had to be used for Johnson vs. Robison, Schlesinger vs. Reservists Committee to Stop the War, and Schick vs. Reed, as the syllabus was missing from the Cornell site
+armed_services_links <- c("Welsh v. United States 398 u.s. 333 (1970)",
+                          "Rostker v. Goldberg 453 u.s. 57 (1981)")
+
+for (i in 1:length(armed_services_links)){
+  decisions$topic[i+36] <- topics[4]
+}
+
+for (i in 1:length(armed_services_links)){
+  decisions$case[i+36] <- html_session(topics_url[4]) %>%
+    follow_link(armed_services_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(armed_services_links)){
+  decisions$argued[i+36] <- html_session(topics_url[4]) %>%
+    follow_link(armed_services_links[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(armed_services_links)){
+  decisions$decided[i+36] <- html_session(topics_url[4]) %>%
+    follow_link(armed_services_links[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(armed_services_links)){
+  decisions$opinion[i+36] <- html_session(topics_url[4]) %>%
+    follow_link(armed_services_links[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
