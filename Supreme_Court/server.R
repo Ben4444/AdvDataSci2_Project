@@ -261,6 +261,160 @@ for (i in 1:length(armed_services_links)){
     html_text()
 }
 
+johnsonVrobison <- read_html("https://supreme.justia.com/cases/federal/us/415/361/")
+schlesingerVrcsw <- read_html("https://supreme.justia.com/cases/federal/us/418/208/")
+schickVreed <- read_html("https://supreme.justia.com/cases/federal/us/419/256/")
+
+decisions$topic[39] <- topics[4]
+decisions$topic[40] <- topics[4]
+decisions$topic[41] <- topics[4]
+
+decisions$case[39] <- johnsonVrobison %>% html_node("h3+ p b") %>% html_text()
+decisions$case[40] <- schlesingerVrcsw %>% html_node("h3+ p b") %>% html_text()
+decisions$case[41] <- schickVreed %>% html_node("h3+ p b") %>% html_text()
+
+decisions$argued[39] <- johnsonVrobison %>% html_node("p:nth-child(5) b") %>% html_text()
+decisions$argued[40] <- schlesingerVrcsw %>% html_node("p:nth-child(5) b") %>% html_text()
+decisions$argued[41] <- schickVreed %>% html_node("p:nth-child(5) b") %>% html_text()
+
+decisions$decided[39] <- johnsonVrobison %>% html_node("p:nth-child(6) b") %>% html_text()
+decisions$decided[40] <- schlesingerVrcsw %>% html_node("p:nth-child(6) b") %>% html_text()
+decisions$decided[41] <- schickVreed %>% html_node("p:nth-child(6) b") %>% html_text()
+
+decisions$opinion[39] <- johnsonVrobison %>% html_node("p:nth-child(23)") %>% html_text()
+decisions$opinion[40] <- schlesingerVrcsw %>% html_node("p:nth-child(15)") %>% html_text()
+decisions$opinion[41] <- schickVreed %>% html_node("p:nth-child(15)") %>% html_text()
+
+# TOPIC: ATTAINDER #
+# Note: A different website had to be used for U.S. vs. Lovett, American Communications Assn. vs. Douds, and Nixon vs. Administrator of General Services, as the syllabus was missing from the Cornell site
+attainder_links <- c("Barenblatt v. United States 360 u.s. 109 (1959)",
+                     "Communist Party of the United States v. Subversive Activities Control Bd. No. 12 367 u.s. 1 (1961)",
+                     "Aptheker v. Secretary of State 378 u.s. 500 (1964)",
+                     "United States v. Brown 381 u.s. 437 (1965)")
+
+for (i in 1:length(attainder_links)){
+  decisions$topic[i+41] <- topics[5]
+}
+
+for (i in 1:length(attainder_links)){
+  decisions$case[i+41] <- html_session(topics_url[5]) %>%
+    follow_link(attainder_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(attainder_links)){
+  decisions$argued[i+41] <- html_session(topics_url[5]) %>%
+    follow_link(attainder_links[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(attainder_links)){
+  decisions$decided[i+41] <- html_session(topics_url[5]) %>%
+    follow_link(attainder_links[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(attainder_links)){
+  decisions$opinion[i+41] <- html_session(topics_url[5]) %>%
+    follow_link(attainder_links[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
+
+usVlovett <- read_html("https://supreme.justia.com/cases/federal/us/328/303/case.html")
+acaVdouds <- read_html("https://supreme.justia.com/cases/federal/us/339/382/case.html")
+nixonVags <- read_html("https://supreme.justia.com/cases/federal/us/433/425/")
+
+decisions$topic[46] <- topics[5]
+decisions$topic[47] <- topics[5]
+decisions$topic[48] <- topics[5]
+
+decisions$case[46] <- usVlovett %>% html_node("h3+ p b") %>% html_text()
+decisions$case[47] <- acaVdouds %>% html_node("h3+ p b") %>% html_text()
+decisions$case[48] <- nixonVags %>% html_node("h3+ p b") %>% html_text()
+
+decisions$argued[46] <- usVlovett %>% html_node("p:nth-child(4) b") %>% html_text()
+decisions$argued[47] <- acaVdouds %>% html_node("p:nth-child(5) b") %>% html_text()
+decisions$argued[48] <- nixonVags %>% html_node("p:nth-child(5) b") %>% html_text()
+
+decisions$decided[46] <- usVlovett %>% html_node("p:nth-child(5) b") %>% html_text()
+decisions$decided[47] <- acaVdouds %>% html_node("p:nth-child(6) b") %>% html_text()
+decisions$decided[48] <- nixonVags %>% html_node("p:nth-child(6) b") %>% html_text()
+
+decisions$opinion[46] <- usVlovett %>% html_node("p:nth-child(22)") %>% html_text()
+decisions$opinion[47] <- acaVdouds %>% html_node("p:nth-child(29)") %>% html_text()
+decisions$opinion[48] <- nixonVags %>% html_node("p:nth-child(34)") %>% html_text()
+
+# TOPIC: ATTORNEYS #
+# Note: A different website had to be used for Butz vs. Economou, as the syllabus was missing from the Cornell site
+attorneys_links <- c("Ex Parte Garland 71 u.s. 333 (1866)",
+                     "In re Primus 436 u.s. 412 (1978)",
+                     "Supreme Court of New Hampshire v. Piper 470 u.s. 274 (1985)",
+                     "Nix v. Whiteside 475 u.s. 157 (1986)",
+                     "Phillips v. Washington Legal Foundation 521 u.s. 117 (1998)")
+
+for (i in 1:length(attorneys_links)){
+  decisions$topic[i+48] <- topics[6]
+}
+
+for (i in 1:length(attorneys_links)){
+  decisions$case[i+48] <- html_session(topics_url[6]) %>%
+    follow_link(attorneys_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(attorneys_links)){
+  decisions$argued[i+48] <- html_session(topics_url[6]) %>%
+    follow_link(attorneys_links[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(attorneys_links)){
+  decisions$decided[i+48] <- html_session(topics_url[6]) %>%
+    follow_link(attorneys_links[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(attorneys_links)){
+  decisions$opinion[i+48] <- html_session(topics_url[6]) %>%
+    follow_link(attorneys_links[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
+
+butzVeconomou <- read_html("https://supreme.justia.com/cases/federal/us/438/478/")
+
+decisions$topic[54] <- topics[6]
+
+decisions$case[54] <- butzVeconomou %>% html_node("h3+ p b") %>% html_text()
+
+decisions$argued[54] <- butzVeconomou %>% html_node("p:nth-child(5) b") %>% html_text()
+
+decisions$decided[54] <- butzVeconomou %>% html_node("p:nth-child(6) b") %>% html_text()
+
+decisions$opinion[54] <- butzVeconomou %>% html_node("p:nth-child(25)") %>% html_text()
+
+# TOPIC: BANKRUPTCY #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
