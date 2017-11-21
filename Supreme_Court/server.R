@@ -31,11 +31,7 @@ cornell_url <- "https://www.law.cornell.edu/supct/cases/topic.htm"
 cornell_html <- paste(readLines(cornell_url), collapse="\n")
 cornell_links <- str_match_all(cornell_html, "<a href=\"/supct/cases/topics/(.*?)\"")
 topics_url <- paste0("https://www.law.cornell.edu/supct/cases/topics/", cornell_links[[1]][,2])
-topics <- cornell_links[[1]][,2]
-topics <- unlist(strsplit(topics, split='tog_', fixed=TRUE))
-toDelete <- seq(1, length(topics), 2)
-topics <-  topics[-toDelete]
-topics <- unlist(strsplit(topics, split='.html', fixed=TRUE))
+topics <- str_replace(topics_url, pattern = ".*/tog_(.*?).html", replacement = "\\1")
 
 cases <- read.csv("Supreme Court Decisions.csv")
 
