@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.Rproj
 .DS_Store
 Justices Data Codebook - Epstein et al. 2017.pdf
 justicesdata.rdata.txt
