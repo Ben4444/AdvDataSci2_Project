@@ -47,36 +47,18 @@ abortion_links <- c("Doe v. Bolton 410 u.s. 179 (1973)", "Bigelow v. Virginia 42
                     "Rust v. Sullivan 500 u.s. 173 (1991)",
                     "Planned Parenthood of Southeastern Pennsylvania v. Casey 505 u.s. 833 (1992)")
 
+
+
 for (i in 1:length(abortion_links)){
   decisions$topic[i] <- topics[1]
 }
 
 for (i in 1:length(abortion_links)){
-  decisions$case[i] <- html_session(topics_url[1]) %>%
-    follow_link(abortion_links[i]) %>%
-    html_node('#page-title') %>% 
-    html_text()
-}
-
-for (i in 1:length(abortion_links)){
-  decisions$argued[i] <- html_session(topics_url[1]) %>%
-    follow_link(abortion_links[i]) %>%
-    html_node('.toccaption:nth-child(5) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(abortion_links)){
-  decisions$decided[i] <- html_session(topics_url[1]) %>%
-    follow_link(abortion_links[i]) %>%
-    html_node('.toccaption:nth-child(6) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(abortion_links)){
-  decisions$opinion[i] <- html_session(topics_url[1]) %>%
-    follow_link(abortion_links[i]) %>%
-    html_node('#block-supremecourt-text li+ li') %>% 
-    html_text()
+  session <- html_session(topics_url[1]) %>% follow_link(abortion_links[i])
+  decisions$case[i] <- html_node(session, '#page-title') %>% html_text()
+  decisions$argued[i] <- html_node(session, '.toccaption:nth-child(5) b') %>% html_text()
+  decisions$decided[i] <- html_node(session, '.toccaption:nth-child(6) b') %>% html_text()
+  decisions$opinion[i] <- html_node(session, '#block-supremecourt-text li+ li') %>% html_text()
 }
 
 roeVwade <- read_html("https://supreme.justia.com/cases/federal/us/410/113/")
