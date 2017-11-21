@@ -52,7 +52,18 @@ for(i in seq_along(topics_url)){
 
 decisions$opinion<-str_extract(decisions$opinion, pattern = "Opinion, .*[a-z]")
 
-decisions[which(!is.na(decisions$topic) & (is.na(decisions$argued) | is.na(decisions$decided) | is.na(decisions$opinion))),]
+#decisions[which(!is.na(decisions$topic) & (is.na(decisions$argued) | is.na(decisions$decided) | is.na(decisions$opinion))),]
+
+indices <- as.numeric(row.names(decisions[str_detect(decisions$case, pattern = "[0-9]{3} U.S. [0-9]{3}") & !is.na(decisions$topic) & (is.na(decisions$argued) | is.na(decisions$decided) | is.na(decisions$opinion)),]))
+
+links <- str_replace(decisions[indices, "case"], pattern = "([0-9]+) U.S. ([0-9]+)", replacement = "https://supreme.justia.com/cases/federal/us/\\1/\\2/")
+
+#for(i in seq_along(links)){
+for(i in 1:4){
+  link_html <- readLines(links[i])
+  decisions[indices[i], "case"] <- str_replace(link_html[str_detect(link_html, "<title>")], ".*<title> (.*?),.*", replacement = "\\1")
+  decisions[indices[i], "argued"] <- 
+}
 
 # TOPIC: ABORTION #
 # Note: A different website had to be used for Roe vs. Wade and Hodgson vs. Minnesota, as the syllabus was missing from the Cornell site
@@ -161,8 +172,6 @@ decisions$opinion[48] <- nixonVags %>% html_node("p:nth-child(34)") %>% html_tex
 # Note: A different website had to be used for Butz vs. Economou, as the syllabus was missing from the Cornell site
 
 butzVeconomou <- read_html("https://supreme.justia.com/cases/federal/us/438/478/")
-
-decisions$topic[54] <- topics[6]
 
 decisions$case[54] <- butzVeconomou %>% html_node("h3+ p b") %>% html_text()
 
