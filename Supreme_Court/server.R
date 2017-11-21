@@ -141,31 +141,11 @@ for (i in 1:length(aliens_links)){
 }
 
 for (i in 1:length(aliens_links)){
-  decisions$case[i+27] <- html_session(topics_url[3]) %>%
-    follow_link(aliens_links[i]) %>%
-    html_node('#page-title') %>% 
-    html_text()
-}
-
-for (i in 1:length(aliens_links)){
-  decisions$argued[i+27] <- html_session(topics_url[3]) %>%
-    follow_link(aliens_links[i]) %>%
-    html_node('.toccaption:nth-child(5) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(aliens_links)){
-  decisions$decided[i+27] <- html_session(topics_url[3]) %>%
-    follow_link(aliens_links[i]) %>%
-    html_node('.toccaption:nth-child(6) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(aliens_links)){
-  decisions$opinion[i+27] <- html_session(topics_url[3]) %>%
-    follow_link(aliens_links[i]) %>%
-    html_node('#block-supremecourt-text li+ li') %>% 
-    html_text()
+  session <- html_session(topics_url[3]) %>% follow_link(aliens_links[i])
+  decisions$case[i+27] <- html_node(session, '#page-title') %>% html_text()
+  decisions$argued[i+27] <- html_node(session, '.toccaption:nth-child(5) b') %>% html_text()
+  decisions$decided[i+27] <- html_node(session, '.toccaption:nth-child(6) b') %>% html_text()
+  decisions$opinion[i+27] <- html_node(session, '#block-supremecourt-text li+ li') %>% html_text()
 }
 
 grahamVdpw <- read_html("https://supreme.justia.com/cases/federal/us/403/365/")
@@ -190,31 +170,11 @@ for (i in 1:length(armed_services_links)){
 }
 
 for (i in 1:length(armed_services_links)){
-  decisions$case[i+36] <- html_session(topics_url[4]) %>%
-    follow_link(armed_services_links[i]) %>%
-    html_node('#page-title') %>% 
-    html_text()
-}
-
-for (i in 1:length(armed_services_links)){
-  decisions$argued[i+36] <- html_session(topics_url[4]) %>%
-    follow_link(armed_services_links[i]) %>%
-    html_node('.toccaption:nth-child(5) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(armed_services_links)){
-  decisions$decided[i+36] <- html_session(topics_url[4]) %>%
-    follow_link(armed_services_links[i]) %>%
-    html_node('.toccaption:nth-child(6) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(armed_services_links)){
-  decisions$opinion[i+36] <- html_session(topics_url[4]) %>%
-    follow_link(armed_services_links[i]) %>%
-    html_node('#block-supremecourt-text li+ li') %>% 
-    html_text()
+  session <- html_session(topics_url[4]) %>% follow_link(armed_services_links[i])
+  decisions$case[i+36] <- html_node(session, '#page-title') %>% html_text()
+  decisions$argued[i+36] <- html_node(session, '.toccaption:nth-child(5) b') %>% html_text()
+  decisions$decided[i+36] <- html_node(session, '.toccaption:nth-child(6) b') %>% html_text()
+  decisions$opinion[i+36] <- html_node(session, '#block-supremecourt-text li+ li') %>% html_text()
 }
 
 johnsonVrobison <- read_html("https://supreme.justia.com/cases/federal/us/415/361/")
@@ -253,31 +213,11 @@ for (i in 1:length(attainder_links)){
 }
 
 for (i in 1:length(attainder_links)){
-  decisions$case[i+41] <- html_session(topics_url[5]) %>%
-    follow_link(attainder_links[i]) %>%
-    html_node('#page-title') %>% 
-    html_text()
-}
-
-for (i in 1:length(attainder_links)){
-  decisions$argued[i+41] <- html_session(topics_url[5]) %>%
-    follow_link(attainder_links[i]) %>%
-    html_node('.toccaption:nth-child(5) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(attainder_links)){
-  decisions$decided[i+41] <- html_session(topics_url[5]) %>%
-    follow_link(attainder_links[i]) %>%
-    html_node('.toccaption:nth-child(6) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(attainder_links)){
-  decisions$opinion[i+41] <- html_session(topics_url[5]) %>%
-    follow_link(attainder_links[i]) %>%
-    html_node('#block-supremecourt-text li+ li') %>% 
-    html_text()
+  session <- html_session(topics_url[5]) %>% follow_link(attainder_links[i])
+  decisions$case[i+41] <- html_node(session, '#page-title') %>% html_text()
+  decisions$argued[i+41] <- html_node(session, '.toccaption:nth-child(5) b') %>% html_text()
+  decisions$decided[i+41] <- html_node(session, '.toccaption:nth-child(6) b') %>% html_text()
+  decisions$opinion[i+41] <- html_node(session, '#block-supremecourt-text li+ li') %>% html_text()
 }
 
 usVlovett <- read_html("https://supreme.justia.com/cases/federal/us/328/303/case.html")
@@ -317,31 +257,11 @@ for (i in 1:length(attorneys_links)){
 }
 
 for (i in 1:length(attorneys_links)){
-  decisions$case[i+48] <- html_session(topics_url[6]) %>%
-    follow_link(attorneys_links[i]) %>%
-    html_node('#page-title') %>% 
-    html_text()
-}
-
-for (i in 1:length(attorneys_links)){
-  decisions$argued[i+48] <- html_session(topics_url[6]) %>%
-    follow_link(attorneys_links[i]) %>%
-    html_node('.toccaption:nth-child(5) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(attorneys_links)){
-  decisions$decided[i+48] <- html_session(topics_url[6]) %>%
-    follow_link(attorneys_links[i]) %>%
-    html_node('.toccaption:nth-child(6) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(attorneys_links)){
-  decisions$opinion[i+48] <- html_session(topics_url[6]) %>%
-    follow_link(attorneys_links[i]) %>%
-    html_node('#block-supremecourt-text li+ li') %>% 
-    html_text()
+  session <- html_session(topics_url[6]) %>% follow_link(attorneys_links[i])
+  decisions$case[i+48] <- html_node(session, '#page-title') %>% html_text()
+  decisions$argued[i+48] <- html_node(session, '.toccaption:nth-child(5) b') %>% html_text()
+  decisions$decided[i+48] <- html_node(session, '.toccaption:nth-child(6) b') %>% html_text()
+  decisions$opinion[i+48] <- html_node(session, '#block-supremecourt-text li+ li') %>% html_text()
 }
 
 butzVeconomou <- read_html("https://supreme.justia.com/cases/federal/us/438/478/")
