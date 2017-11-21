@@ -47,8 +47,6 @@ abortion_links <- c("Doe v. Bolton 410 u.s. 179 (1973)", "Bigelow v. Virginia 42
                     "Rust v. Sullivan 500 u.s. 173 (1991)",
                     "Planned Parenthood of Southeastern Pennsylvania v. Casey 505 u.s. 833 (1992)")
 
-
-
 for (i in 1:length(abortion_links)){
   decisions$topic[i] <- topics[1]
 }
@@ -97,31 +95,11 @@ for (i in 1:length(affirmative_action_links)){
 }
 
 for (i in 1:length(affirmative_action_links)){
-  decisions$case[i+15] <- html_session(topics_url[2]) %>%
-    follow_link(affirmative_action_links[i]) %>%
-    html_node('#page-title') %>% 
-    html_text()
-}
-
-for (i in 1:length(affirmative_action_links)){
-  decisions$argued[i+15] <- html_session(topics_url[2]) %>%
-    follow_link(affirmative_action_links[i]) %>%
-    html_node('.toccaption:nth-child(5) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(affirmative_action_links)){
-  decisions$decided[i+15] <- html_session(topics_url[2]) %>%
-    follow_link(affirmative_action_links[i]) %>%
-    html_node('.toccaption:nth-child(6) b') %>% 
-    html_text()
-}
-
-for (i in 1:length(affirmative_action_links)){
-  decisions$opinion[i+15] <- html_session(topics_url[2]) %>%
-    follow_link(affirmative_action_links[i]) %>%
-    html_node('#block-supremecourt-text li+ li') %>% 
-    html_text()
+  session <- html_session(topics_url[2]) %>% follow_link(affirmative_action_links[i])
+  decisions$case[i+15] <- html_node(session, '#page-title') %>% html_text()
+  decisions$argued[i+15] <- html_node(session, '.toccaption:nth-child(5) b') %>% html_text()
+  decisions$decided[i+15] <- html_node(session, '.toccaption:nth-child(6) b') %>% html_text()
+  decisions$opinion[i+15] <- html_node(session, '#block-supremecourt-text li+ li') %>% html_text()
 }
 
 wygantVjbe <- read_html("https://supreme.justia.com/cases/federal/us/476/267/")
