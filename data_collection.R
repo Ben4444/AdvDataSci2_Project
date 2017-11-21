@@ -1,8 +1,7 @@
-# This is the server logic for a Shiny web application.
-# You can find out more about building applications with Shiny here:
-#
-# http://shiny.rstudio.com
-#
+library(rvest)
+library(dplyr)
+library(readr)
+library(stringr)
 
 # Loading in Supreme Court nominee data, obtained from http://epstein.wustl.edu/research/justicesdata.html
 justicesdata <- read.csv("http://epstein.wustl.edu/research/justicesdata.csv")
@@ -19,10 +18,6 @@ justices <- subset(justicesdata, select=c("name", "yrnom", "posit", "recess", "s
 justices <- subset(justices, serve == 1 | serve == 777)
 
 # Scraping data from the Cornell Law page, looking at Historic Supreme Court Decisions - by Topic, https://www.law.cornell.edu/supct/cases/topic.htm
-library(rvest)
-library(dplyr)
-library(readr)
-library(stringr)
 
 cornell_url <- "https://www.law.cornell.edu/supct/cases/topic.htm"
 cornell_html <- readLines(cornell_url)
@@ -30,26 +25,34 @@ cornell_links <- na.omit(str_extract(cornell_html, "/supct/cases/topics/(.*?).ht
 topics_url <- paste0("https://www.law.cornell.edu", cornell_links)
 topics <- str_replace(topics_url, pattern = ".*/tog_(.*?).html", replacement = "\\1")
 
-cases <- read.csv("Supreme Court Decisions.csv")
+cases <- read.csv("Supreme Court Decisions.csv", sep = "\t")
 
 decisions <- data.frame(matrix(ncol = 5, nrow = 2530))
 colnames(decisions) <- c("topic", "case", "argued", "decided", "opinion")
 x = 1
 
+# Does not grab info for communism
 for(i in seq_along(topics_url)){
   topic_html <- readLines(topics_url[i])
-  links <- na.omit(str_extract(topic_html, "/supct/html/historics/USSC_CR_.*.html"))
+  links <- na.omit(str_extract(topic_html, "/supct/html/historics/USSC_.*.html"))
   links <- paste0("https://www.law.cornell.edu",links)
   for(j in seq_along(links)){
     session <- html_session(links[j])
     decisions$topic[x] <- topics[i]
     decisions$case[x] <- html_node(session, '#page-title') %>% html_text()
+    if(is.na(decisions$case[x])){
+      decisions$case[x] <- html_node(session, '.sylcta') %>% html_text()
+    }
     decisions$argued[x] <- html_node(session, '.toccaption:nth-child(5) b') %>% html_text()
     decisions$decided[x] <- html_node(session, '.toccaption:nth-child(6) b') %>% html_text()
     decisions$opinion[x] <- html_node(session, '#block-supremecourt-text li+ li') %>% html_text()
     x = x + 1
   }
 }
+
+decisions$opinion<-str_extract(decisions$opinion, pattern = "Opinion, .*[a-z]")
+
+decisions[which(!is.na(decisions$topic) & (is.na(decisions$argued) | is.na(decisions$decided) | is.na(decisions$opinion))),]
 
 # TOPIC: ABORTION #
 # Note: A different website had to be used for Roe vs. Wade and Hodgson vs. Minnesota, as the syllabus was missing from the Cornell site
@@ -58,8 +61,6 @@ for(i in seq_along(topics_url)){
 roeVwade <- read_html("https://supreme.justia.com/cases/federal/us/410/113/")
 hodgsonVminnesota <- read_html("https://supreme.justia.com/cases/federal/us/497/417/")
 
-decisions$topic[14] <- topics[1]
-decisions$topic[15] <- topics[1]
 
 decisions$case[14] <- roeVwade %>% html_node("h3+ p b") %>% html_text()
 decisions$case[15] <- hodgsonVminnesota %>% html_node("h3+ p b") %>% html_text()
@@ -81,10 +82,6 @@ wygantVjbe <- read_html("https://supreme.justia.com/cases/federal/us/476/267/")
 usVparadise <- read_html("https://supreme.justia.com/cases/federal/us/480/149/")
 corVjacc <- read_html("https://supreme.justia.com/cases/federal/us/488/469/")
 
-decisions$topic[25] <- topics[2]
-decisions$topic[26] <- topics[2]
-decisions$topic[27] <- topics[2]
-
 decisions$case[25] <- wygantVjbe %>% html_node("h3+ p b") %>% html_text()
 decisions$case[26] <- usVparadise %>% html_node("h3+ p") %>% html_text()
 decisions$case[27] <- corVjacc %>% html_node("h3+ p b") %>% html_text()
@@ -105,7 +102,6 @@ decisions$opinion[27] <- corVjacc %>% html_node("p:nth-child(44)") %>% html_text
 
 grahamVdpw <- read_html("https://supreme.justia.com/cases/federal/us/403/365/")
 
-decisions$topic[36] <- topics[3]
 
 decisions$case[36] <- grahamVdpw %>% html_node("h3+ p b") %>% html_text()
 
@@ -121,10 +117,6 @@ decisions$opinion[36] <- grahamVdpw %>% html_node("p:nth-child(12)") %>% html_te
 johnsonVrobison <- read_html("https://supreme.justia.com/cases/federal/us/415/361/")
 schlesingerVrcsw <- read_html("https://supreme.justia.com/cases/federal/us/418/208/")
 schickVreed <- read_html("https://supreme.justia.com/cases/federal/us/419/256/")
-
-decisions$topic[39] <- topics[4]
-decisions$topic[40] <- topics[4]
-decisions$topic[41] <- topics[4]
 
 decisions$case[39] <- johnsonVrobison %>% html_node("h3+ p b") %>% html_text()
 decisions$case[40] <- schlesingerVrcsw %>% html_node("h3+ p b") %>% html_text()
@@ -148,10 +140,6 @@ decisions$opinion[41] <- schickVreed %>% html_node("p:nth-child(15)") %>% html_t
 usVlovett <- read_html("https://supreme.justia.com/cases/federal/us/328/303/case.html")
 acaVdouds <- read_html("https://supreme.justia.com/cases/federal/us/339/382/case.html")
 nixonVags <- read_html("https://supreme.justia.com/cases/federal/us/433/425/")
-
-decisions$topic[46] <- topics[5]
-decisions$topic[47] <- topics[5]
-decisions$topic[48] <- topics[5]
 
 decisions$case[46] <- usVlovett %>% html_node("h3+ p b") %>% html_text()
 decisions$case[47] <- acaVdouds %>% html_node("h3+ p b") %>% html_text()
@@ -183,55 +171,3 @@ decisions$argued[54] <- butzVeconomou %>% html_node("p:nth-child(5) b") %>% html
 decisions$decided[54] <- butzVeconomou %>% html_node("p:nth-child(6) b") %>% html_text()
 
 decisions$opinion[54] <- butzVeconomou %>% html_node("p:nth-child(25)") %>% html_text()
-
-# TOPIC: BANKRUPTCY #
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-library(shiny)
-shinyServer(function(input, output) {
-
-  output$distPlot <- renderPlot({
-
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2]
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
-
-  })
-
-})
