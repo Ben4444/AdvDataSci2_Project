@@ -59,10 +59,10 @@ indices <- as.numeric(row.names(decisions[str_detect(decisions$case, pattern = "
 links <- str_replace(decisions[indices, "case"], pattern = "([0-9]+) U.S. ([0-9]+)", replacement = "https://supreme.justia.com/cases/federal/us/\\1/\\2/")
 
 #for(i in seq_along(links)){
-for(i in 1:4){
   link_html <- readLines(links[i])
   decisions[indices[i], "case"] <- str_replace(link_html[str_detect(link_html, "<title>")], ".*<title> (.*?),.*", replacement = "\\1")
-  decisions[indices[i], "argued"] <- 
+  decisions[indices[i], "argued"] <- paste("Argued:", str_replace(link_html[str_detect(link_html, "<p><b>Argued")], pattern = ".*<p><b>Argued (.*?)<.*", replacement = "\\1"))
+  decisions[indices[i], "decided"] <- paste("Decided:", str_replace(link_html[str_detect(link_html, "<p><b>Decided")], pattern = ".*<p><b>Decided (.*?)<.*", replacement = "\\1"))
 }
 
 # TOPIC: ABORTION #
