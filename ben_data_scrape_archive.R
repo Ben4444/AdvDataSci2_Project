@@ -1604,6 +1604,3 @@ for (i in 1:length(communism_page7_links_2)){
     html_node('#block-supremecourt-text li+ li') %>% 
     html_text()
 }
-
-# TOPIC: CONFESSIONS #
-confessions_links <- c("Chambers v. Florida 309 u.s. 227 (1940)")

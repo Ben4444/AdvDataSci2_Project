@@ -27,7 +27,7 @@ topics <- str_replace(topics_url, pattern = ".*/tog_(.*?).html", replacement = "
 
 cases <- read.csv("Supreme Court Decisions.csv", sep = "\t")
 
-decisions <- data.frame(matrix(ncol = 5, nrow = 2530))
+decisions <- data.frame(matrix(ncol = 5, nrow = 2528))
 colnames(decisions) <- c("topic", "case", "argued", "decided", "opinion")
 x = 1
 
@@ -87,11 +87,543 @@ for(i in seq_along(links)){
   }
 }
 
-str_replace(decisions[,"argued",drop = F])
 
-# TOPIC: AFFIRMATIVE ACTION #
-# Note: A different website had to be used for Wygant vs. Jackson Board of Education, United States vs. Paradise, and City of Richmond vs. J.A. Croson Co., as the syllabus was missing from the Cornell site
 
-wygantVjbe <- read_html("https://supreme.justia.com/cases/federal/us/476/267/")
 
-decisions$opinion[25] <- wygantVjbe %>% html_node("p:nth-child(22)") %>% html_text()
+# TOPIC: COMMUNISM #
+communism_page1_links <- c("Kalman J. BERENYI, Petitioner, v. DISTRICT DIRECTOR, IMMIGRATION AND NATURALIZATION SERVICE.",
+                           "W. E. B. DuBOIS CLUBS OF AMERICA et al. v. CLARK et al.",
+                           "Charles ROWOLDT, Petitioner, v. J. D. PERFETTO, Acting Officer in Charge, Immigration and Naturalization Service, Department of Justice, St. Paul, Minnesota.",
+                           "Willia NIUKKANEN, etc., Petitioner, v. E. D. McALEXANDER, etc.",
+                           "Barenblatt v. United States",
+                           "Stanislaw NOWAK, Petitioner, v. UNITED STATES of America.",
+                           "Bond v. Floyd",
+                           "DENNIS v. UNITED STATES.",
+                           "SCHNEIDERMAN v. UNITED STATES.",
+                           "TERMINIELLO v. CITY OF CHICAGO.")
+
+for (i in 1:length(communism_page1_links)){
+  decisions$topic[i+2465] <- "communism"
+}
+
+for (i in 1:length(communism_page1_links)){
+  decisions$case[i+2465] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+    follow_link(communism_page1_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page1_links)){
+  decisions$argued[i+2465] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+    follow_link(communism_page1_links[i]) %>%
+    html_node('.docketno+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page1_links)){
+  decisions$decided[i+2465] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+    follow_link(communism_page1_links[i]) %>%
+    html_node('.date+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page1_links)){
+  decisions$opinion[i+2465] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+    follow_link(communism_page1_links[i]) %>%
+    html_node('li:nth-child(1) > .writnav') %>% 
+    html_text()
+}
+
+decisions$decided[2467] <- decisions$argued[2467]
+decisions$argued[2467] <- NA
+
+decisions$argued[2470] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+  follow_link("Barenblatt v. United States") %>%
+  html_node('.toccaption:nth-child(5) b') %>% 
+  html_text()
+
+decisions$decided[2470] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+  follow_link("Barenblatt v. United States") %>%
+  html_node('.toccaption:nth-child(6) b') %>% 
+  html_text()
+
+decisions$opinion[2470] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+  follow_link("Barenblatt v. United States") %>%
+  html_node('#block-supremecourt-text li+ li') %>% 
+  html_text()
+
+decisions$argued[2472] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+  follow_link("Bond v. Floyd") %>%
+  html_node('.toccaption:nth-child(5) b') %>% 
+  html_text()
+
+decisions$decided[2472] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+  follow_link("Bond v. Floyd") %>%
+  html_node('.toccaption:nth-child(6) b') %>% 
+  html_text()
+
+decisions$opinion[2472] <- html_session("https://www.law.cornell.edu/search/site/[communism]?f[0]=bundle%3Asupct_node&&query=[communism]") %>%
+  follow_link("Bond v. Floyd") %>%
+  html_node('#block-supremecourt-text li+ li') %>% 
+  html_text()
+
+communism_page2_links <- c("Hugo DeGREGORY, Appellant, v. ATTORNEY GENERAL OF the STATE OF NEW HAMPSHIRE.",
+                           "Mabel BLACK and T. Y. Wulff et al., Petitioners, v. CUTTER LABORATORIES, a Corporation.",
+                           "John Francis NOTO, Petitioner, v. UNITED STATES.",
+                           "Willard UPHAUS, Appellant, v. Louis C. WYMAN, Attorney General, State of New Hampshire.",
+                           "Bernhard DEUTCH, Petitioner, v. UNITED STATES.",
+                           "HERNDON v. LOWRY, Sheriff.",
+                           "Carl BRADEN, Petitioner, v. UNITED STATES.")
+
+for (i in 1:length(communism_page2_links)){
+  decisions$topic[i+2475] <- "communism"
+}
+
+for (i in 1:length(communism_page2_links)){
+  decisions$case[i+2475] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page2_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page2_links)){
+  decisions$argued[i+2475] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page2_links[i]) %>%
+    html_node('.docketno+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page2_links)){
+  decisions$decided[i+2475] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page2_links[i]) %>%
+    html_node('.date+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page2_links)){
+  decisions$opinion[i+2475] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page2_links[i]) %>%
+    html_node('li:nth-child(1) > .writnav') %>% 
+    html_text()
+}
+
+decisions$topic[2483:2485] <- "communism"
+
+decisions$case[2483] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Dennis v. United States") %>%
+  html_node('#page-title') %>% 
+  html_text()
+
+decisions$argued[2483] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Dennis v. United States") %>%
+  html_node('.toccaption:nth-child(5) b') %>% 
+  html_text()
+
+decisions$decided[2483] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Dennis v. United States") %>%
+  html_node('.toccaption:nth-child(6) b') %>% 
+  html_text()
+
+decisions$opinion[2483] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Dennis v. United States") %>%
+  html_node('#block-supremecourt-text li+ li') %>% 
+  html_text()
+
+decisions$case[2484] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Watkins v. United States") %>%
+  html_node('#page-title') %>% 
+  html_text()
+
+decisions$argued[2484] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Watkins v. United States") %>%
+  html_node('.toccaption:nth-child(5) b') %>% 
+  html_text()
+
+decisions$decided[2484] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Watkins v. United States") %>%
+  html_node('.toccaption:nth-child(6) b') %>% 
+  html_text()
+
+decisions$opinion[2484] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Watkins v. United States") %>%
+  html_node('#block-supremecourt-text li+ li') %>% 
+  html_text()
+
+decisions$case[2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Whitney v. California") %>%
+  html_node('#page-title') %>% 
+  html_text()
+
+decisions$argued[2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Whitney v. California") %>%
+  html_node('.toccaption:nth-child(5) b') %>% 
+  html_text()
+
+decisions$decided[2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Whitney v. California") %>%
+  html_node('.toccaption:nth-child(6) b') %>% 
+  html_text()
+
+decisions$opinion[2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=1&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Whitney v. California") %>%
+  html_node('#block-supremecourt-text li+ li') %>% 
+  html_text()
+
+communism_page3_links <- c("Theodore R. GIBSON, Petitioner, v. FLORIDA LEGISLATIVE INVESTIGATION COMMITTEE.",
+                           "Jose Maria GASTELUM-QUINONES, Petitioner, v. Robert F. KENNEDY, Attorney General of the United States (two cases).",
+                           "Rudolph SCHWARE, Petitioner, v. BOARD OF BAR EXAMINERS OF THE STATE OF NEW MEXICO.",
+                           "Herbert SCHNEIDER, Appellant, v. Willard SMITH, Commandant, United States Coast Guard.",
+                           "AMERICAN COMMITTEE FOR PROTECTION OF FOREIGN BORN, Petitioner, v. SUBVERSIVE ACTIVITIES CONTROL BOARD.",
+                           "Sara BAIRD, Petitioner, v. STATE BAR OF ARIZONA.",
+                           "Otho G. BELL et al., Petitioners, v. UNITED STATES.",
+                           "Brian V. HUNTER and Jeffrey Jordan v. James V. BRYANT, Jr.",
+                           "Frank BONETTI, Petitioner, v. William P. ROGERS, Attorney General of the United States, et al.")
+
+for (i in 1:length(communism_page3_links)){
+  decisions$topic[i+2485] <- "communism"
+}
+
+for (i in 1:length(communism_page3_links)){
+  decisions$case[i+2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=2&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page3_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page3_links)){
+  decisions$argued[i+2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=2&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page3_links[i]) %>%
+    html_node('.docketno+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page3_links)){
+  decisions$decided[i+2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=2&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page3_links[i]) %>%
+    html_node('.date+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page3_links)){
+  decisions$opinion[i+2485] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=2&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page3_links[i]) %>%
+    html_node('li:nth-child(1) > .writnav') %>% 
+    html_text()
+}
+
+decisions$decided[2493] <- decisions$argued[2493]
+decisions$argued[2493] <- NA
+
+communism_page4_links <- c("GALVAN v. PRESS.",
+                           "HARTZEL v. UNITED STATES.",
+                           "Paul M. SWEEZY, Appellant, v. STATE OF NEW HAMPSHIRE by Louis C. WYMAN, Attorney General.",
+                           "Julius EMSPAK, Petitioner, v. UNITED STATES of America.",
+                           "Frank DYSON, Chief of Police, City of Dallas, et al., Appellants, v. Brent STEIN.",
+                           "RAILWAY EMPLOYES' DEPARTMENT, American Federation of Labor, International Association of Machinists, et al., Appellants, v. Robert L. HANSON, Horace A. Cameron, Harold J. Grau, et al.",
+                           "COMMUNIST PARTY OF THE UNITED STATES of America, Petitioner, v. SUBVERSIVE ACTIVITIES CONTROL BOARD.")
+
+for (i in 1:length(communism_page4_links)){
+  decisions$topic[i+2494] <- "communism"
+}
+
+for (i in 1:length(communism_page4_links)){
+  decisions$case[i+2494] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page4_links[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page4_links)){
+  decisions$argued[i+2494] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page4_links[i]) %>%
+    html_node('.docketno+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page4_links)){
+  decisions$decided[i+2494] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page4_links[i]) %>%
+    html_node('.date+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page4_links)){
+  decisions$opinion[i+2494] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page4_links[i]) %>%
+    html_node('li:nth-child(1) > .writnav') %>% 
+    html_text()
+}
+
+decisions$topic[2502:2503] <- "communism"
+
+decisions$case[2502] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Yates v. United States") %>%
+  html_node('#page-title') %>% 
+  html_text()
+
+decisions$argued[2502] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Yates v. United States") %>%
+  html_node('.toccaption:nth-child(5) b') %>% 
+  html_text()
+
+decisions$decided[2502] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Yates v. United States") %>%
+  html_node('.toccaption:nth-child(6) b') %>% 
+  html_text()
+
+decisions$opinion[2502] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Yates v. United States") %>%
+  html_node('#block-supremecourt-text li+ li') %>% 
+  html_text()
+
+decisions$case[2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Slochower v. Board of Higher Education of New York City") %>%
+  html_node('#page-title') %>% 
+  html_text()
+
+decisions$argued[2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Slochower v. Board of Higher Education of New York City") %>%
+  html_node('.toccaption:nth-child(5) b') %>% 
+  html_text()
+
+decisions$decided[2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Slochower v. Board of Higher Education of New York City") %>%
+  html_node('.toccaption:nth-child(6) b') %>% 
+  html_text()
+
+decisions$opinion[2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=3&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+  follow_link("Slochower v. Board of Higher Education of New York City") %>%
+  html_node('#block-supremecourt-text li+ li') %>% 
+  html_text()
+
+communism_page5_links_1 <- c("CAFETERIA AND RESTAURANT WORKERS UNION, LOCAL 473, AFL-CIO, et al., Petitioners, v. Neil H. McELROY et al.",
+                             "SHAUGHNESSY, District Director of Immigration and Naturalization, v. UNITED STATES ex rel. MEZEI.",
+                             "Raphael KONIGSBERG, Petitioner, v. The STATE BAR OF CALIFORNIA and the Committee of Bar Examiners of the State Barof California.")
+
+communism_page5_links_2 <- c("Clark v. Community for Creative Nonviolence",
+                             "Board of Education v. Allen",
+                             "Kent v. Dulles",
+                             "Scales v. United States",
+                             "Pennsylvania v. Nelson",
+                             "Gitlow v. People",
+                             "Communist Party of the United States v. Subversive Activities Control Bd. No. 12")
+
+for (i in 1:length(communism_page5_links_1)){
+  decisions$topic[i+2503] <- "communism"
+}
+
+for (i in 1:length(communism_page5_links_1)){
+  decisions$case[i+2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_1[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page5_links_1)){
+  decisions$argued[i+2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_1[i]) %>%
+    html_node('.docketno+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page5_links_1)){
+  decisions$decided[i+2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_1[i]) %>%
+    html_node('.date+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page5_links_1)){
+  decisions$opinion[i+2503] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_1[i]) %>%
+    html_node('li:nth-child(1) > .writnav') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page5_links_2)){
+  decisions$topic[i+2506] <- "communism"
+}
+
+for (i in 1:length(communism_page5_links_2)){
+  decisions$case[i+2506] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_2[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page5_links_2)){
+  decisions$argued[i+2506] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_2[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page5_links_2)){
+  decisions$decided[i+2506] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_2[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page5_links_2)){
+  decisions$opinion[i+2506] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=4&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page5_links_2[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
+
+communism_page6_links_1 <- c("Richard L. THORNBURGH, Attorney General of the United States, et al., Petitioners v. Jack ABBOTT, et al.",
+                             "Oswald ZSCHERNIG et al., Appellants, v. William J. MILLER, Administrator et al.",
+                             "FLEMMING, Secretary of Health, Education, and Welfare, Appellant, v. Ephram NESTOR.",
+                             "Thomas QUINN, Petitioner, v. UNITED STATES of America.",
+                             "KEDROFF et al. v. ST. NICHOLAS CATHEDRAL OF RUSSIAN ORTHODOX CHURCH IN NORTH AMERICA.")
+
+communism_page6_links_2 <- c("Aptheker v. Secretary of State",
+                             "Perez v. Brownell",
+                             "KERRY v. DIN",
+                             "Rust v. Sullivan")
+
+for (i in 1:length(communism_page6_links_1)){
+  decisions$topic[i+2513] <- "communism"
+}
+
+for (i in 1:length(communism_page6_links_1)){
+  decisions$case[i+2513] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_1[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page6_links_1)){
+  decisions$argued[i+2513] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_1[i]) %>%
+    html_node('.docketno+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page6_links_1)){
+  decisions$decided[i+2513] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_1[i]) %>%
+    html_node('.date+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page6_links_1)){
+  decisions$opinion[i+2513] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_1[i]) %>%
+    html_node('li:nth-child(1) > .writnav') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page6_links_2)){
+  decisions$topic[i+2518] <- "communism"
+}
+
+for (i in 1:length(communism_page6_links_2)){
+  decisions$case[i+2518] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_2[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page6_links_2)){
+  decisions$argued[i+2518] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_2[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page6_links_2)){
+  decisions$decided[i+2518] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_2[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page6_links_2)){
+  decisions$opinion[i+2518] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=5&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page6_links_2[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
+
+decisions$opinion[2521] <- "Scalia"
+
+communism_page7_links_1 <- c("CARLSON et al. v. LANDON, District Director of Immigration & Naturalization, United States Department of Justice. BUTTERFIELD, Director of Immigration & Naturalization Service, Detroit, Mich. v. ZYDOK.",
+                             "BRIDGES v. WIXON, District Director, Immigration and Naturalization Service.",
+                             "Raphael KONIGSBERG, Petitioner, v. STATE BAR OF CALIFORNIA and the Committee of Bar Examiners of the State of California.")
+
+communism_page7_links_2 <- c("United States v. United States District Court",
+                             "Skinner v. Railway Labor Executives' Association",
+                             "School District of Abington Township, Pennsylvania v. Schempp")
+
+for (i in 1:length(communism_page7_links_1)){
+  decisions$topic[i+2522] <- "communism"
+}
+
+for (i in 1:length(communism_page7_links_1)){
+  decisions$case[i+2522] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_1[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page7_links_1)){
+  decisions$argued[i+2522] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_1[i]) %>%
+    html_node('.docketno+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page7_links_1)){
+  decisions$decided[i+2522] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_1[i]) %>%
+    html_node('.date+ .date') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page7_links_1)){
+  decisions$opinion[i+2522] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_1[i]) %>%
+    html_node('li:nth-child(1) > .writnav') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page7_links_2)){
+  decisions$topic[i+2525] <- "communism"
+}
+
+for (i in 1:length(communism_page7_links_2)){
+  decisions$case[i+2525] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_2[i]) %>%
+    html_node('#page-title') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page7_links_2)){
+  decisions$argued[i+2525] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_2[i]) %>%
+    html_node('.toccaption:nth-child(5) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page7_links_2)){
+  decisions$decided[i+2525] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_2[i]) %>%
+    html_node('.toccaption:nth-child(6) b') %>% 
+    html_text()
+}
+
+for (i in 1:length(communism_page7_links_2)){
+  decisions$opinion[i+2525] <- html_session("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D") %>%
+    follow_link(communism_page7_links_2[i]) %>%
+    html_node('#block-supremecourt-text li+ li') %>% 
+    html_text()
+}
+
+
+saveRDS(justices, "justices.rds")
+saveRDS(decisions, "decisions.rds")
+
+justices <- readRDS("justices.rds")
+decisions <- readRDS("decisions.rds")
