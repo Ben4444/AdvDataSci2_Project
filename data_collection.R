@@ -222,7 +222,7 @@ decisions <- scrape_communism_data_1("https://www.law.cornell.edu/search/site/%5
 
 decisions <- scrape_communism_data_2("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D", communism_page7_links_2, n=2525)
 
-decisiosn <- decisions[!is.na(decisions$topic),]
+decisions <- decisions[!is.na(decisions$topic),]
 
 ######################
 # Data Cleaning
