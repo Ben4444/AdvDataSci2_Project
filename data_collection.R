@@ -222,6 +222,7 @@ decisions <- scrape_communism_data_1("https://www.law.cornell.edu/search/site/%5
 
 decisions <- scrape_communism_data_2("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D", communism_page7_links_2, n=2525)
 
+decisiosn <- decisions[!is.na(decisions$topic),]
 
 ######################
 # Data Cleaning
@@ -245,6 +246,13 @@ decisions$opinion <- str_to_title(decisions$opinion)
 
 decisions[41, "argued"] <- "March 24, 1981"
 decisions[41, "decided"] <- "June 25, 1981"
+
+decisions[7, "opinion"] <- "Powell"
+decisions[22, "opinion"] <- "Powell"
+decisions[23, "opinion"] <- "Brennan"
+decisions[55, "opinion"] <- "Brennan"
+decisions[67, "opinion"] <- "None" # No majority opinion written for Furman v. Georgia
+
 
 saveRDS(justices, "justices.rds")
 saveRDS(decisions, "decisions.rds")
