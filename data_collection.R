@@ -52,7 +52,7 @@ for(i in seq_along(topics_url)){
 
 #decisions$opinion<-str_extract(tail(decisions$opinion,100), pattern = "[Oo]pinion, .*[a-z]")
 
-indices <- as.numeric(row.names(decisions[str_detect(decisions$case, pattern = "[0-9]{3} U.S. [0-9]{3}") & !is.na(decisions$topic) & (is.na(decisions$argued) | is.na(decisions$decided) | is.na(decisions$opinion)),]))
+indices <- as.numeric(row.names(decisions[str_detect(decisions$case, pattern = "[0-9]+ U.S. [0-9]+") & !is.na(decisions$topic) & (is.na(decisions$argued) | is.na(decisions$decided) | is.na(decisions$opinion)),]))
 
 links <- str_replace(decisions[indices, "case"], pattern = "([0-9]+) U.S. ([0-9]+)", replacement = "https://supreme.justia.com/cases/federal/us/\\1/\\2/")
 
@@ -221,6 +221,30 @@ communism_page7_links_2 <- c("United States v. United States District Court",
 decisions <- scrape_communism_data_1("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D", communism_page7_links_1, n=2522)
 
 decisions <- scrape_communism_data_2("https://www.law.cornell.edu/search/site/%5Bcommunism%5D?page=6&f%5B0%5D=bundle%3Asupct_node&query=%5Bcommunism%5D", communism_page7_links_2, n=2525)
+
+
+######################
+# Data Cleaning
+######################
+
+decisions$argued <- str_replace(decisions$argued, pattern = "Argued: ", replacement = "")
+decisions$argued <- str_replace(decisions$argued, pattern = "Argued ", replacement = "")
+decisions$argued <- str_replace(decisions$argued, pattern = "[Rr]eargued.*", replacement = "")
+decisions[!is.na(decisions$argued) & decisions$argued == "", "argued"] <- NA
+
+decisions$decided <- str_replace(decisions$decided, pattern = "[ ]+\\[\\*\\]", replacement = "")
+decisions$decided <- str_replace(decisions$decided, pattern = "\\*$", replacement = "")
+decisions$decided <- str_replace(decisions$decided, pattern = "Decided: ", replacement = "")
+decisions$decided <- str_replace(decisions$decided, pattern = "Opinion and judgments announced ", replacement = "")
+decisions[!is.na(decisions$decided) & decisions$decided == "", "decided"] <- NA
+
+decisions$opinion <- str_replace(decisions$opinion, pattern = "[Oo]pinion, ", replacement = "")
+decisions$opinion <- str_replace(decisions$opinion, pattern = ",.*", replacement = "")
+decisions[!is.na(decisions$opinion) & decisions$opinion == "", "opinion"] <- NA
+decisions$opinion <- str_to_title(decisions$opinion)
+
+decisions[41, "argued"] <- "March 24, 1981"
+decisions[41, "decided"] <- "June 25, 1981"
 
 saveRDS(justices, "justices.rds")
 saveRDS(decisions, "decisions.rds")
