@@ -246,6 +246,20 @@ decisions$opinion <- str_to_title(decisions$opinion)
 decisions[41, "argued"] <- "March 24, 1981"
 decisions[41, "decided"] <- "June 25, 1981"
 
+decisions$topic <- str_replace(decisions$topic, pattern = "_", replacement = " ")
+
+decisions$opinion[decisions$case == "Poelker v. Doe"] <- "Burger"
+decisions$opinion[decisions$case == "Wygant v. Jackson Bd. of Educ."] <- "Powell"
+decisions$opinion[decisions$case == "United States v. Paradise"] <- "Brennan"
+
+
+
+
+
+
+
+
+
 saveRDS(justices, "justices.rds")
 saveRDS(decisions, "decisions.rds")
 
