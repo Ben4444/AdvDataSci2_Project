@@ -750,7 +750,7 @@ full$yrstart <- as.numeric(full$yrstart)
 full$yrend <- str_split(full$datesere, pattern = "/", n = 3, simplify = TRUE)[,3]
 full$yrend <- as.numeric(full$yrend)
 
-full <- subset(full, (yrstart < yrdecided & yrdecided < yrend) | opinion == "Per curiam")
+full <- subset(full, (yrstart <= yrdecided & yrdecided <= yrend) | opinion == "Per curiam")
 
 full <- full[!duplicated(full[,c("opinion", "topic", "case")]),]
 
