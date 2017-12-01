@@ -722,3 +722,36 @@ saveRDS(decisions, "decisions.rds")
 
 justices <- readRDS("justices.rds")
 decisions <- readRDS("decisions.rds")
+
+
+# Merging the decisions and justice data
+
+as.character(decisions$opinion)
+decisions$opinion <- str_trim(decisions$opinion, side = "both")
+decisions$opinion <- str_replace(decisions$opinion, pattern = "O'connor", replacement = "O'Connor")
+
+justices$opinion <- str_split(justices$name, pattern = ",", simplify = TRUE)[,1]
+as.character(justices$opinion)
+
+full <- merge(decisions, justices, by = "opinion", all.x = TRUE, sort = FALSE)
+
+saveRDS(full, "full.rds")
+
+full <- readRDS("full.rds")
+
+# Cleaning full dataset
+
+full$yrdecided <- str_split(full$decided, pattern = ", ", simplify = TRUE)[,2]
+full$yrdecided <- as.numeric(full$yrdecided)
+
+full$yrstart <- str_split(full$dateserb, pattern = "/", n = 3, simplify = TRUE)[,3]
+full$yrstart <- as.numeric(full$yrstart)
+
+full$yrend <- str_split(full$datesere, pattern = "/", n = 3, simplify = TRUE)[,3]
+full$yrend <- as.numeric(full$yrend)
+
+full <- subset(full, (yrstart < yrdecided & yrdecided < yrend) | opinion == "Per curiam")
+
+full <- full[!duplicated(full[,c("opinion", "topic", "case")]),]
+
+saveRDS(full, "full.rds")
