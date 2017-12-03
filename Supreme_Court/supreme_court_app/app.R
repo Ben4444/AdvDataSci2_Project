@@ -10,8 +10,11 @@
 library(shiny)
 library(ggplot2)
 library(lubridate)
-data_1<- full
 
+full <- readRDS("full.rds")
+data_1<- full
+unique_topic_list<-as.list(unique(data_1$topic))
+unique_justice_list<-as.list(unique(data_1$opinion))
 
 
 
