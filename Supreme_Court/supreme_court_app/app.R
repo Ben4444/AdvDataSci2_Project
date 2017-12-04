@@ -6,6 +6,10 @@
 #
 #    http://shiny.rstudio.com/
 #
+rsconnect::setAccountInfo(name='jhubiostatistics',
+                          token='41969E2AC0F047B42111176450B2ADB8',
+                          secret='vzjG1Ab7kdLIzR7mFTQW3uJdJnzhcsv5NBcanzXs')
+
 
 library(shiny)
 library(ggplot2)
