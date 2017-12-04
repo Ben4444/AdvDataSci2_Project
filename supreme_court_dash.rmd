@@ -8,413 +8,222 @@ output:
 runtime: shiny
 ---
 ```{r setup, include=FALSE}
+#rsconnect::setAccountInfo(name='jhubiostatistics',
+#                          token='41969E2AC0F047B42111176450B2ADB8',
+#                          secret='vzjG1Ab7kdLIzR7mFTQW3uJdJnzhcsv5NBcanzXs')
+
 library(flexdashboard)
+library(shiny)
+library(ggplot2)
+library(lubridate)
 
-dat<-readRDS("full.rds")
+dat <- readRDS("full.rds")
+dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
+topic_list <- unique(dat$topic)
+justice_list <- unique(dat$opinion)
 ```
 
-```{r var_init}
-cell_params_plot<-c("type","sex","source_plate","Cluster")
-TenX_params_plot<-c("cell_type","treatment","num_genes_detected","total_UMI")
-Neuroglial_params_plot<-c("cell_type","mclust","treatment","total_UMI","num_genes_detected")
-```
-
-Gene Expression
+Tab 1
 =======================================================================
 
 Column {.sidebar}
 -----------------------------------------------------------------------
 
-#### Select Genes
+#### Set Parameters
 ```{r}
-textInput("marker_genes", label = "Genes (comma-separated):",
-          value=NULL,
-          placeholder="e.g. Cdh13,Pantr1"
-            )
+selectInput("topic", label = "Topic:",
+            choices = topic_list, selected = topic_list[1])
 
-selectInput("color_by", label = "Color by:",
-            choices = cell_params_plot, selected = "genotype")
-```
-
-#### Expression levels
-```{r}
-radioButtons("bar_type",label="Plot type:",
-            choices=list("Summary Bar plot"=2,"Per cell"=1),
-            selected=2)
-
-checkboxInput("log_mode",label="Log transform:",
-              value=FALSE)
-
-selectInput("bar_metric",label="Summary statistic:",
-            choices=c("mean","median"),
-            selected="mean")
-```
-
-#### Components
-```{r}
-sliderInput("pca_x_choice",label="x",
-            min=1,max=20,value=1,step=1,round=TRUE)
-
-sliderInput("pca_y_choice",label="y",
-            min=1,max=20,value=2,step=1,round=TRUE)
+selectInput("justice", label = "Justice:",
+            choices = justice_list, selected = justice_list[1])
 ```
 
 Column {.tabset}
 -----------------------------------------------------------------------
 
-### tSNE
+### Topic
 
 ```{r}
-renderPlot({
+#renderPlot({
   #Process marker_genes input  
-  if(input$marker_genes=="")
-      markers<-NULL
-  else
-      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
+#  if(input$marker_genes=="")
+#      markers<-NULL
+#  else
+#      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
   
   #Process color choice
     #Process color choice
-  if(length(levels(pData(dat)[[input$color_by]]))<10)
-    palette<- scale_color_brewer(palette="Set1")
-  else
-    palette<- scale_color_discrete()
+#  if(length(levels(pData(dat)[[input$color_by]]))<10)
+#    palette<- scale_color_brewer(palette="Set1")
+#  else
+#    palette<- scale_color_discrete()
   
-  myTSNEPlotAlpha(dat,markers=markers,color=input$color_by,cell_size=2,scale=T) + palette
+#  myTSNEPlotAlpha(dat,markers=markers,color=input$color_by,cell_size=2,scale=T) + palette
   
-})
-```
-
-
-### PCA
-```{r}
-dat.pca<-reactive({
-  prcomp(t(log2(as.matrix(exprs(dat[fData(dat)$high_bcv,])+1))),center=T,scale=T)
-})
-
+#})
 
 renderPlot({
+  data_plotted_justice<- subset(dat, opinion==input$justice)
+  
+  #create bins for histogram
+  bins_just <- seq(min(data_plotted_justice$decided), max(data_plotted_justice$decided),by="days")
+  
+  hist(data_plotted_justice$decided,breaks=bins_just,main=c("Histogram of Supreme Court cases with opinion written by",input$justice,"over time"), xlab= "Date of court decision")
+})
+```
+
+
+### Justice
+```{r}
+#dat.pca<-reactive({
+#  prcomp(t(log2(as.matrix(exprs(dat[fData(dat)$high_bcv,])+1))),center=T,scale=T)
+#})
+
+
+#renderPlot({
   #Process color choice
     #Process color choice
-  if(length(levels(pData(dat)[[input$color_by]]))<10)
-    palette<- scale_color_brewer(palette="Set1")
-  else
-    palette<- scale_color_discrete()
+#  if(length(levels(pData(dat)[[input$color_by]]))<10)
+#    palette<- scale_color_brewer(palette="Set1")
+#  else
+#    palette<- scale_color_discrete()
   
-  ggbiplot(dat.pca(),choices=c(input$pca_x_choice,input$pca_y_choice),scale=0,groups=pData(dat)[[input$color_by]],ellipse=T,var.axes=F) + monocle:::monocle_theme_opts() + palette + theme(legend.position=c(0.05,0.9))
+#  ggbiplot(dat.pca(),choices=c(input$pca_x_choice,input$pca_y_choice),scale=0,groups=pData(dat)[[input$color_by]],ellipse=T,var.axes=F) + monocle:::monocle_theme_opts() + palette + theme(legend.position=c(0.05,0.9))
   
-})
+#})
   
 ```
 
-### DDRTree
+### Combined
 
 ```{r}
 #markers
-renderPlot({
+#renderPlot({
   #Process marker_genes input  
-  if(input$marker_genes=="")
-      markers<-NULL
-  else
-      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
+#  if(input$marker_genes=="")
+#      markers<-NULL
+#  else
+#      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
   
   #Process color choice
-  if(length(levels(pData(dat)[[input$color_by]]))<10)
-    palette<- scale_color_brewer(palette="Set1")
-  else
-    palette<- scale_color_discrete()
+#  if(length(levels(pData(dat)[[input$color_by]]))<10)
+#    palette<- scale_color_brewer(palette="Set1")
+#  else
+#    palette<- scale_color_discrete()
   
-  plot_cell_trajectory(dat,markers=markers,color_by=input$color_by) + palette
+#  plot_cell_trajectory(dat,markers=markers,color_by=input$color_by) + palette
   #myTSNEPlotAlpha(dat,markers=markers,color=input$color_by,shape="pool",cell_size=2,scale=T) + palette + coord_equal(1.6)
   
-})
+#})
 ```
 
 
 Column {data-width=350}
 -----------------------------------------------------------------------
 
-### Expression levels
+### Other plot
 
 ```{r}
-renderPlot({
+#renderPlot({
   #Process marker_genes input  
-  if(input$marker_genes=="")
-      markers<-NULL
-  else
-      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
+#  if(input$marker_genes=="")
+#      markers<-NULL
+#  else
+#      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
   
   #Process color choice
-  if(length(levels(pData(dat)[[input$color_by]]))<10) {
-    color_palette<- scale_color_brewer(palette="Set1")
-    fill_palette<- scale_fill_brewer(palette="Set1")
-  }else{
-    color_palette<- scale_color_discrete()
-    fill_palette<- scale_fill_discrete()
-  }
+#  if(length(levels(pData(dat)[[input$color_by]]))<10) {
+#    color_palette<- scale_color_brewer(palette="Set1")
+#    fill_palette<- scale_fill_brewer(palette="Set1")
+#  }else{
+#    color_palette<- scale_color_discrete()
+#    fill_palette<- scale_fill_discrete()
+#  }
   
-  req(length(markers)>=1)
-  if(input$bar_type==1)
-    myBarMap(dat,geneset=markers,color_by=input$color_by,facet_by=input$color_by,cluster="column",logMode=input$log_mode) + monocle:::monocle_theme_opts() + color_palette + fill_palette + guides(fill=FALSE)
-  else
-    mySummaryBarPlot(dat,geneset=markers,metric=input$bar_metric,color_by=input$color_by,facet_by=input$color_by,logMode=input$log_mode) + fill_palette + guides(fill=FALSE)
-})
+#  req(length(markers)>=1)
+#  if(input$bar_type==1)
+#    myBarMap(dat,geneset=markers,color_by=input$color_by,facet_by=input$color_by,cluster="column",logMode=input$log_mode) + monocle:::monocle_theme_opts() + color_palette + fill_palette + guides(fill=FALSE)
+#  else
+#    mySummaryBarPlot(dat,geneset=markers,metric=input$bar_metric,color_by=input$color_by,facet_by=input$color_by,logMode=input$log_mode) + fill_palette + guides(fill=FALSE)
+#})
 ```
 
-### Gene Expression Info
+### Some table
 
 ```{r}
-DT::renderDataTable({
-  req(input$marker_genes)
+#DT::renderDataTable({
+#  req(input$marker_genes)
   #Process marker_genes input  
-  markers<-lookupGeneId(dat,str_trim(unlist(str_split(input$marker_genes,","))))
-  sub.melt<-meltCDS(dat,geneset=markers)
-  facet_by_melt<-strsplit(input$color_by,"\\+")[[1]]
-  sub.melt.summary<-sub.melt %>%
-    dplyr::group_by_(.dots=c("gene_short_name",facet_by_melt)) %>%
-    dplyr::summarise(mean=mean(value),median=median(value),sd=sd(value),upper_bound=mean+sd,lower_bound=max(mean-sd,0))
+#  markers<-lookupGeneId(dat,str_trim(unlist(str_split(input$marker_genes,","))))
+#  sub.melt<-meltCDS(dat,geneset=markers)
+#  facet_by_melt<-strsplit(input$color_by,"\\+")[[1]]
+#  sub.melt.summary<-sub.melt %>%
+#    dplyr::group_by_(.dots=c("gene_short_name",facet_by_melt)) %>%
+#    dplyr::summarise(mean=mean(value),median=median(value),sd=sd(value),upper_bound=mean+sd,lower_bound=max(mean-sd,0))
 
 
-  sub.melt.summary  
-})
+#  sub.melt.summary  
+#})
 ```
 
-Pseudotime
+Tab 2
 ================================================================
 
 Column {.sidebar}
 ----------------------------------------------------------------
 
-#### Select Genes
+#### Set Parameters
 ```{r}
-textInput("pseudotime_marker_genes", label = "Genes (comma-separated):",
-          value=NULL,
-          placeholder="e.g. Cdh13,Pantr1"
-            )
+selectInput("topic", label = "Topic:",
+            choices = topic_list, selected = topic_list[1])
 
-selectInput("pseudotime_color_by", label = "Color by:",
-            choices = cell_params_plot, selected = "genotype")
+selectInput("justice", label = "Justice:",
+            choices = justice_list, selected = justice_list[1])
 ```
 
-#### Branch States
-```{r}
-sliderInput("branch_choice_1",label="Branch State 1",
-            min=1,max=length(levels(pData(dat)$State)),value=1,step=1,round=TRUE)
-
-sliderInput("branch_choice_2",label="Branch State 2",
-            min=1,max=length(levels(pData(dat)$State)),value=15,step=1,round=TRUE)
-```
 
 Column
 -----------------------------------------------------------------
 
-### DDRTree
+### Plot 1
 ```{r}
-#markers
-pseudotime_markers<-reactive({
+#pseudotime_markers<-reactive({
   #Process marker_genes input  
-  if(input$pseudotime_marker_genes=="")
-      return(NULL)
-  else
-      return(str_trim(unlist(str_split(input$pseudotime_marker_genes,","))))
+#  if(input$pseudotime_marker_genes=="")
+#      return(NULL)
+#  else
+#      return(str_trim(unlist(str_split(input$pseudotime_marker_genes,","))))
   
-})
-pseudotime_palette<-reactive({
+#})
+#pseudotime_palette<-reactive({
   #Process color choice
-  if(length(levels(pData(dat)[[input$pseudotime_color_by]]))<10)
-    palette<- scale_color_brewer(palette="Set1")
-  else
-    palette<- scale_color_discrete()
-})
+#  if(length(levels(pData(dat)[[input$pseudotime_color_by]]))<10)
+#    palette<- scale_color_brewer(palette="Set1")
+#  else
+#    palette<- scale_color_discrete()]
+#})
 
-renderPlot({
-  if(length(pseudotime_markers())<1){
-    plot_cell_trajectory(dat,color_by="Pseudotime")
-  } else {
-  plot_cell_trajectory(dat,markers=pseudotime_markers(),color_by=input$pseudotime_color_by) + pseudotime_palette()
-  }
+#renderPlot({
+#  if(length(pseudotime_markers())<1){
+#    plot_cell_trajectory(dat,color_by="Pseudotime")
+#  } else {
+#  plot_cell_trajectory(dat,markers=pseudotime_markers(),color_by=input$pseudotime_color_by) + pseudotime_palette()
+#  }
   
-})
+#})
 ```
 
 
 Column
 -----------------------------------------------------------------
 
-### Pseudotime
+### Another plot
 
 ```{r}
-renderPlot({
-  req(length(pseudotime_markers())>=1)
+#renderPlot({
+#  req(length(pseudotime_markers())>=1)
 #  plot_genes_branched_pseudotime(dat[lookupGeneId(dat,pseudotime_markers()),],branch_states=c(input$branch_choice_1,input$branch_choice_2),color_by=input$pseudotime_color_by) +
-  plot_genes_in_pseudotime(dat[lookupGeneId(dat,pseudotime_markers()),],color_by=input$pseudotime_color_by) + pseudotime_palette()
+#  plot_genes_in_pseudotime(dat[lookupGeneId(dat,pseudotime_markers()),],color_by=input$pseudotime_color_by) + pseudotime_palette()
   
-})
-```
-
-
-10X Data
-================================================================
-
-Column {.sidebar}
-----------------------------------------------------------------
-
-#### Grouping
-```{r}
-selectInput("TenX_color_by", label = "Color by:",
-            choices = TenX_params_plot, selected = "cell_type")
-```
-
-#### Select Genes
-```{r}
-textInput("TenX_marker_genes", label = "Genes (comma-separated):",
-          value=NULL,
-          placeholder="e.g. Cdh13,Pantr1"
-            )
-```
-
-#### Expression levels
-```{r}
-selectInput("TenX_bar_metric",label="Summary statistic:",
-            choices=c("mean","median"),
-            selected="mean")
-```
-
-Column
------------------------------------------------------------------
-
-### tSNE
-
-```{r}
-renderPlot({
-  #Process marker_genes input  
-  if(input$TenX_marker_genes=="")
-      markers<-NULL
-  else
-      markers<-str_trim(unlist(str_split(input$TenX_marker_genes,",")))
-  
-  LizTSNEPlot(cds,markers=markers,color=input$TenX_color_by,scale=F)
-})
-```
-
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Expression levels
-
-```{r}
-renderPlot({
-  #Process marker_genes input  
-  markers<-str_trim(unlist(str_split(input$TenX_marker_genes,",")))
-
-  req(length(markers)>=1)
-
-  TenX_SummaryBarPlot(cds,markers=markers,metric=input$TenX_bar_metric,color_by=input$TenX_color_by,facet_by=input$TenX_color_by) + guides(fill=FALSE)
-})
-```
-
-### Gene Expression Info
-
-```{r}
-DT::renderDataTable({
-  req(input$TenX_marker_genes)
-  #Process marker_genes input  
-  markers<-TenX_lookupGeneId(cds,str_trim(unlist(str_split(input$TenX_marker_genes,","))))
-  
-  sub.melt<-TenX_meltCDS(cds,markers)
-  sub.melt.summary<-sub.melt %>%
-    dplyr::group_by_(.dots=c("symbol",input$TenX_color_by)) %>%
-    dplyr::summarise(mean=mean(value),median=median(value),sd=sd(value),upper_bound=mean+sd,lower_bound=max(mean-sd,0))
-
-  sub.melt.summary
-})
-```
-
-
-
-10X Neuroglial Subset
-================================================================
-
-Column {.sidebar}
-----------------------------------------------------------------
-
-#### Grouping
-```{r}
-selectInput("Neuroglial_color_by", label = "Color by:",
-            choices = Neuroglial_params_plot, selected = "cell_type")
-```
-
-#### Select Genes
-```{r}
-textInput("Neuroglial_marker_genes", label = "Genes (comma-separated):",
-          value=NULL,
-          placeholder="e.g. Cdh13,Pantr1"
-            )
-```
-
-#### Expression levels
-```{r}
-selectInput("Neuroglial_bar_metric",label="Summary statistic:",
-            choices=c("mean","median"),
-            selected="mean")
-```
-
-Column
------------------------------------------------------------------------
-
-### tSNE
-
-```{r}
-renderPlot({
-  #Process marker_genes input  
-  if(input$Neuroglial_marker_genes=="")
-      markers<-NULL
-  else
-      markers<-str_trim(unlist(str_split(input$Neuroglial_marker_genes,",")))
-  LizTSNEPlot(ens_cds,markers=markers,color=input$Neuroglial_color_by,scale=F)
-})
-```
-
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Expression levels
-
-```{r}
-renderPlot({
-  #Process marker_genes input  
-  if(input$Neuroglial_marker_genes=="")
-      markers<-NULL
-  else
-      markers<-str_trim(unlist(str_split(input$Neuroglial_marker_genes,",")))
-  
-  palette<-scale_fill_gradientn(colours = myPalette(100))
-  if(is.discrete(input$Neuroglial_color_by)){
-    ncolor<-length(unique(input$Neuroglial_color_by))
-    palette<-scale_fill_brewer(palette="Set1")
-    if(ncolor > 9){
-      palette<-scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(ncolor))
-    }
-  }
-  
-  req(length(markers)>=1)
-  TenX_SummaryBarPlot(ens_cds,markers=markers,metric=input$Neuroglial_bar_metric,color_by=input$Neuroglial_color_by,facet_by=input$Neuroglial_color_by) + palette + guides(fill=FALSE)
-
-  })
-```
-
-### Gene Expression Info
-
-```{r}
-DT::renderDataTable({
-  req(input$Neuroglial_marker_genes)
-  #Process marker_genes input  
-  markers<-TenX_lookupGeneId(cds,str_trim(unlist(str_split(input$Neuroglial_marker_genes,","))))
-  
-  sub.melt<-TenX_meltCDS(cds,markers)
-  sub.melt.summary<-sub.melt %>%
-    dplyr::group_by_(.dots=c("symbol",input$Neuroglial_color_by)) %>%
-    dplyr::summarise(mean=mean(value),median=median(value),sd=sd(value),upper_bound=mean+sd,lower_bound=max(mean-sd,0))
-
-  sub.melt.summary
-})
+#})
 ```
