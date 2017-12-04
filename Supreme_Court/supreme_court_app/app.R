@@ -22,7 +22,7 @@ unique_justice_list<-as.list(unique(data_1$opinion))
 
 
 
-
+# browser()
 # Define UI for application that draws a histogram
 ui <- fluidPage(
    
