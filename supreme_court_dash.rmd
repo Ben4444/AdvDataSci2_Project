@@ -2,7 +2,7 @@
 title: "Supreme Court Decisions"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
+    orientation: rows
     vertical_layout: fill
     theme: spacelab
 runtime: shiny
@@ -16,14 +16,16 @@ library(flexdashboard)
 library(shiny)
 library(ggplot2)
 library(lubridate)
+library(RColorBrewer)
 
 dat <- readRDS("full.rds")
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
+dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
 justice_list <- unique(dat$opinion)
 ```
 
-Tab 1
+By Topic
 =======================================================================
 
 Column {.sidebar}
@@ -32,141 +34,53 @@ Column {.sidebar}
 #### Set Parameters
 ```{r}
 selectInput("topic", label = "Topic:",
-            choices = topic_list, selected = topic_list[1])
-
-selectInput("justice", label = "Justice:",
-            choices = justice_list, selected = justice_list[1])
+            choices = topic_list, selected = NULL, multiple = T)
 ```
 
-Column {.tabset}
+Row
 -----------------------------------------------------------------------
 
-### Topic
-
 ```{r}
-#renderPlot({
-  #Process marker_genes input  
-#  if(input$marker_genes=="")
-#      markers<-NULL
-#  else
-#      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
-  
-  #Process color choice
-    #Process color choice
-#  if(length(levels(pData(dat)[[input$color_by]]))<10)
-#    palette<- scale_color_brewer(palette="Set1")
-#  else
-#    palette<- scale_color_discrete()
-  
-#  myTSNEPlotAlpha(dat,markers=markers,color=input$color_by,cell_size=2,scale=T) + palette
-  
-#})
-
 renderPlot({
-  data_plotted_justice<- subset(dat, opinion==input$justice)
-  
-  #create bins for histogram
-  bins_just <- seq(min(data_plotted_justice$decided), max(data_plotted_justice$decided),by="days")
-  
-  hist(data_plotted_justice$decided,breaks=bins_just,main=c("Histogram of Supreme Court cases with opinion written by",input$justice,"over time"), xlab= "Date of court decision")
+  ggplot(dat) + 
+    geom_bar(aes(x = reorder(topic, -table(topic)[topic]))) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+    scale_y_continuous(expand = c(0,5)) + 
+    labs(x = "Topic", y = "No. Cases")
 })
 ```
 
 
-### Justice
-```{r}
-#dat.pca<-reactive({
-#  prcomp(t(log2(as.matrix(exprs(dat[fData(dat)$high_bcv,])+1))),center=T,scale=T)
-#})
-
-
-#renderPlot({
-  #Process color choice
-    #Process color choice
-#  if(length(levels(pData(dat)[[input$color_by]]))<10)
-#    palette<- scale_color_brewer(palette="Set1")
-#  else
-#    palette<- scale_color_discrete()
-  
-#  ggbiplot(dat.pca(),choices=c(input$pca_x_choice,input$pca_y_choice),scale=0,groups=pData(dat)[[input$color_by]],ellipse=T,var.axes=F) + monocle:::monocle_theme_opts() + palette + theme(legend.position=c(0.05,0.9))
-  
-#})
-  
-```
-
-### Combined
-
-```{r}
-#markers
-#renderPlot({
-  #Process marker_genes input  
-#  if(input$marker_genes=="")
-#      markers<-NULL
-#  else
-#      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
-  
-  #Process color choice
-#  if(length(levels(pData(dat)[[input$color_by]]))<10)
-#    palette<- scale_color_brewer(palette="Set1")
-#  else
-#    palette<- scale_color_discrete()
-  
-#  plot_cell_trajectory(dat,markers=markers,color_by=input$color_by) + palette
-  #myTSNEPlotAlpha(dat,markers=markers,color=input$color_by,shape="pool",cell_size=2,scale=T) + palette + coord_equal(1.6)
-  
-#})
-```
-
-
-Column {data-width=350}
+Row
 -----------------------------------------------------------------------
 
-### Other plot
-
 ```{r}
-#renderPlot({
-  #Process marker_genes input  
-#  if(input$marker_genes=="")
-#      markers<-NULL
-#  else
-#      markers<-str_trim(unlist(str_split(input$marker_genes,",")))
+renderPlot({
+  req(!is.null(input$topic))
   
-  #Process color choice
-#  if(length(levels(pData(dat)[[input$color_by]]))<10) {
-#    color_palette<- scale_color_brewer(palette="Set1")
-#    fill_palette<- scale_fill_brewer(palette="Set1")
-#  }else{
-#    color_palette<- scale_color_discrete()
-#    fill_palette<- scale_fill_discrete()
-#  }
+  dat_subset <- dat[dat$topic %in% input$topic, c("opinion","topic")]
+  melted_df <- as.data.frame(table(dat_subset))
   
-#  req(length(markers)>=1)
-#  if(input$bar_type==1)
-#    myBarMap(dat,geneset=markers,color_by=input$color_by,facet_by=input$color_by,cluster="column",logMode=input$log_mode) + monocle:::monocle_theme_opts() + color_palette + fill_palette + guides(fill=FALSE)
-#  else
-#    mySummaryBarPlot(dat,geneset=markers,metric=input$bar_metric,color_by=input$color_by,facet_by=input$color_by,logMode=input$log_mode) + fill_palette + guides(fill=FALSE)
-#})
+  palette = scale_fill_brewer(palette = "Set1")
+  if(length(unique(dat_subset$opinion)) > 9){ 
+       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(unique(dat_subset$opinion))))
+  }
+  
+for(j in input$topic){
+  melted_df[melted_df$topic == j,"percent"] <- melted_df[melted_df$topic == j,"Freq"]*100 / sum(melted_df[melted_df$topic == j,"Freq"])
+}
+  
+  ggplot(melted_df) + 
+    geom_col(aes(x = reorder(topic, -table(topic)[topic]), y = percent, fill = opinion)) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom") + 
+    scale_y_continuous(limits = c(0, NA),expand = c(0,0)) + 
+    labs(x = "Topic", y = "No. Cases", fill = "Justice\nDelivering\nOpinion") +
+    palette
+})
 ```
 
-### Some table
 
-```{r}
-#DT::renderDataTable({
-#  req(input$marker_genes)
-  #Process marker_genes input  
-#  markers<-lookupGeneId(dat,str_trim(unlist(str_split(input$marker_genes,","))))
-#  sub.melt<-meltCDS(dat,geneset=markers)
-#  facet_by_melt<-strsplit(input$color_by,"\\+")[[1]]
-#  sub.melt.summary<-sub.melt %>%
-#    dplyr::group_by_(.dots=c("gene_short_name",facet_by_melt)) %>%
-#    dplyr::summarise(mean=mean(value),median=median(value),sd=sd(value),upper_bound=mean+sd,lower_bound=max(mean-sd,0))
-
-
-#  sub.melt.summary  
-#})
-```
-
-Tab 2
+By Justice
 ================================================================
 
 Column {.sidebar}
@@ -174,56 +88,43 @@ Column {.sidebar}
 
 #### Set Parameters
 ```{r}
-selectInput("topic", label = "Topic:",
-            choices = topic_list, selected = topic_list[1])
-
 selectInput("justice", label = "Justice:",
-            choices = justice_list, selected = justice_list[1])
+            choices = justice_list, selected = NULL, multiple = T)
 ```
 
+Row
+-----------------------------------------------------------------------
 
-Column
------------------------------------------------------------------
-
-### Plot 1
 ```{r}
-#pseudotime_markers<-reactive({
-  #Process marker_genes input  
-#  if(input$pseudotime_marker_genes=="")
-#      return(NULL)
-#  else
-#      return(str_trim(unlist(str_split(input$pseudotime_marker_genes,","))))
-  
-#})
-#pseudotime_palette<-reactive({
-  #Process color choice
-#  if(length(levels(pData(dat)[[input$pseudotime_color_by]]))<10)
-#    palette<- scale_color_brewer(palette="Set1")
-#  else
-#    palette<- scale_color_discrete()]
-#})
-
-#renderPlot({
-#  if(length(pseudotime_markers())<1){
-#    plot_cell_trajectory(dat,color_by="Pseudotime")
-#  } else {
-#  plot_cell_trajectory(dat,markers=pseudotime_markers(),color_by=input$pseudotime_color_by) + pseudotime_palette()
-#  }
-  
-#})
+renderPlot({
+  ggplot(dat) + 
+    geom_bar(aes(x = reorder(opinion, datesen))) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+    scale_y_continuous(expand = c(0,5)) + 
+    labs(x = "Justice", y = "No. Times Justice Delivered Opinion")
+})
 ```
 
-
-Column
------------------------------------------------------------------
-
-### Another plot
+Row
+-----------------------------------------------------------------------
 
 ```{r}
-#renderPlot({
-#  req(length(pseudotime_markers())>=1)
-#  plot_genes_branched_pseudotime(dat[lookupGeneId(dat,pseudotime_markers()),],branch_states=c(input$branch_choice_1,input$branch_choice_2),color_by=input$pseudotime_color_by) +
-#  plot_genes_in_pseudotime(dat[lookupGeneId(dat,pseudotime_markers()),],color_by=input$pseudotime_color_by) + pseudotime_palette()
+renderPlot({
+  req(!is.null(input$justice))
   
-#})
+  palette = scale_fill_brewer(palette = "Set1")
+  if(length(input$justice) > 9){ 
+       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(input$justice)))
+  }
+  
+  dat_subset <- dat[dat$opinion %in% input$justice, c("opinion", "topic")]
+  melted_df <- as.data.frame(table(dat_subset))
+  ggplot(melted_df) + 
+    geom_col(aes(x = topic, y = Freq, fill = opinion), position = "dodge") + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), panel.grid.major.y = element_line(color = "grey90")) +
+    scale_y_continuous(limits = c(NA,NA),expand = c(0,0)) +
+    geom_text(aes(x = 1,y=Freq + 1, label="")) +
+    labs(x = "Topic", y = "No. Cases", fill = "Justice Delivering Opinion") +
+    palette
+})
 ```
