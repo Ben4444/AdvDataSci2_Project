@@ -1,0 +1,130 @@
+---
+title: "Supreme Court Decisions"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    theme: spacelab
+runtime: shiny
+---
+```{r setup, include=FALSE}
+#rsconnect::setAccountInfo(name='jhubiostatistics',
+#                          token='41969E2AC0F047B42111176450B2ADB8',
+#                          secret='vzjG1Ab7kdLIzR7mFTQW3uJdJnzhcsv5NBcanzXs')
+
+library(flexdashboard)
+library(shiny)
+library(ggplot2)
+library(lubridate)
+library(RColorBrewer)
+
+dat <- readRDS("full.rds")
+dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
+dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
+topic_list <- unique(dat$topic)
+justice_list <- unique(dat$opinion)
+```
+
+By Topic
+=======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+#### Set Parameters
+```{r}
+selectInput("topic", label = "Topic:",
+            choices = topic_list, selected = NULL, multiple = T)
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+  ggplot(dat) + 
+    geom_bar(aes(x = reorder(topic, -table(topic)[topic]))) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+    scale_y_continuous(expand = c(0,5)) + 
+    labs(x = "Topic", y = "No. Cases")
+})
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+  req(!is.null(input$topic))
+  
+  dat_subset <- dat[dat$topic %in% input$topic, c("opinion","topic")]
+  melted_df <- as.data.frame(table(dat_subset))
+  
+  palette = scale_fill_brewer(palette = "Set1")
+  if(length(unique(dat_subset$opinion)) > 9){ 
+       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(unique(dat_subset$opinion))))
+  }
+  
+for(j in input$topic){
+  melted_df[melted_df$topic == j,"percent"] <- melted_df[melted_df$topic == j,"Freq"]*100 / sum(melted_df[melted_df$topic == j,"Freq"])
+}
+  
+  ggplot(melted_df) + 
+    geom_col(aes(x = reorder(topic, -table(topic)[topic]), y = percent, fill = opinion)) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom") + 
+    scale_y_continuous(limits = c(0, NA),expand = c(0,0)) + 
+    labs(x = "Topic", y = "No. Cases", fill = "Justice\nDelivering\nOpinion") +
+    palette
+})
+```
+
+
+By Justice
+================================================================
+
+Column {.sidebar}
+----------------------------------------------------------------
+
+#### Set Parameters
+```{r}
+selectInput("justice", label = "Justice:",
+            choices = justice_list, selected = NULL, multiple = T)
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+  ggplot(dat) + 
+    geom_bar(aes(x = reorder(opinion, datesen))) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+    scale_y_continuous(expand = c(0,5)) + 
+    labs(x = "Justice", y = "No. Times Justice Delivered Opinion")
+})
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+  req(!is.null(input$justice))
+  
+  palette = scale_fill_brewer(palette = "Set1")
+  if(length(input$justice) > 9){ 
+       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(input$justice)))
+  }
+  
+  dat_subset <- dat[dat$opinion %in% input$justice, c("opinion", "topic")]
+  melted_df <- as.data.frame(table(dat_subset))
+  ggplot(melted_df) + 
+    geom_col(aes(x = topic, y = Freq, fill = opinion), position = "dodge") + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), panel.grid.major.y = element_line(color = "grey90")) +
+    scale_y_continuous(limits = c(NA,NA),expand = c(0,0)) +
+    geom_text(aes(x = 1,y=Freq + 1, label="")) +
+    labs(x = "Topic", y = "No. Cases", fill = "Justice Delivering Opinion") +
+    palette
+})
+```
