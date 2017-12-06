@@ -377,6 +377,10 @@ decisions$case[2521] <- "Kerry v. Din"
 decisions$case[2523] <- "Carlson v. Landon"
 decisions$case[2524] <- "Bridges v. Wixon"
 decisions$case[2525] <- "Konigsberg v. State Bar of California (No. 2)"
+decisions$case[847] <- "Brown v. Board of Education (No. 1)"
+decisions$case[848] <- "Brown v. Board of Education (No. 2)"
+decisions$case[586] <- "Milliken v. Bradley (No. 1)"
+decisions$case[589] <- "Milliken v. Bradley (No. 2)"
 
 decisions$argued[decisions$case == "Ex Parte Garland"] <- "December 15, 1865"
 decisions$argued[decisions$case == "Barron v. Mayor & City Council of Baltimore"] <- "February 11, 1833"
@@ -723,15 +727,19 @@ saveRDS(decisions, "decisions.rds")
 justices <- readRDS("justices.rds")
 decisions <- readRDS("decisions.rds")
 
-
 # Merging the decisions and justice data
 
-as.character(decisions$opinion)
+decisions$opinion <- as.character(decisions$opinion)
 decisions$opinion <- str_trim(decisions$opinion, side = "both")
 decisions$opinion <- str_replace(decisions$opinion, pattern = "O'connor", replacement = "O'Connor")
+decisions$opinion <- str_replace(decisions$opinion, pattern = "Mcreynolds", replacement = "McReynolds")
+
+saveRDS(decisions, "decisions.rds")
 
 justices$opinion <- str_split(justices$name, pattern = ",", simplify = TRUE)[,1]
-as.character(justices$opinion)
+justices$opinion <- as.character(justices$opinion)
+
+saveRDS(justices, "justices.rds")
 
 full <- merge(decisions, justices, by = "opinion", all.x = TRUE, sort = FALSE)
 
@@ -742,16 +750,26 @@ full <- readRDS("full.rds")
 # Cleaning full dataset
 
 full$yrdecided <- str_split(full$decided, pattern = ", ", simplify = TRUE)[,2]
+full$yrdecided[full$yrdecided == "" & full$case == "Foster & Elam v. Neilson"] <- "1829"
+full$yrdecided[full$yrdecided == "" & full$case == "Talbot v. Janson"] <- "1795"
 full$yrdecided <- as.numeric(full$yrdecided)
 
 full$yrstart <- str_split(full$dateserb, pattern = "/", n = 3, simplify = TRUE)[,3]
+full$yrstart[full$yrstart == "" & full$name == "Holmes, Oliver Wendell, Jr"] <- "1902"
+full$yrstart[full$yrstart == "" & full$name == "Curtis, Benjamin Robbins"] <- "1851"
+full$yrstart[full$yrstart == "" & full$name == "Davis, David"] <- "1862"
 full$yrstart <- as.numeric(full$yrstart)
 
 full$yrend <- str_split(full$datesere, pattern = "/", n = 3, simplify = TRUE)[,3]
+full$yrend[full$datesere == "999. JUSTICE STILL ON COURT"] <- "2017"
+full$yrend[full$yrend == "" & full$name == "Curtis, Benjamin Robbins"] <- "1857"
 full$yrend <- as.numeric(full$yrend)
 
 full <- subset(full, (yrstart <= yrdecided & yrdecided <= yrend) | opinion == "Per curiam")
 
 full <- full[!duplicated(full[,c("opinion", "topic", "case")]),]
+
+full$name <- as.character(full$name)
+full$name[full$opinion == "Per curiam"] <- "Per curiam"
 
 saveRDS(full, "full.rds")

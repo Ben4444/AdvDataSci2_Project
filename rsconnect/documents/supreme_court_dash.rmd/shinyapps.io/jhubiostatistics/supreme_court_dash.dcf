@@ -1,0 +1,12 @@
+name: supreme_court_dash
+title: supreme_court_dash
+username:
+account: jhubiostatistics
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 245242
+bundleId: 1119317
+url: https://jhubiostatistics.shinyapps.io/supreme_court_dash/
+when: 1512585343.83545
+asMultiple: FALSE
+asStatic: FALSE
