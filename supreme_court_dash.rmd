@@ -8,9 +8,9 @@ output:
 runtime: shiny
 ---
 ```{r setup, include=FALSE}
-#rsconnect::setAccountInfo(name='jhubiostatistics',
-#                          token='41969E2AC0F047B42111176450B2ADB8',
-#                          secret='vzjG1Ab7kdLIzR7mFTQW3uJdJnzhcsv5NBcanzXs')
+rsconnect::setAccountInfo(name='jhubiostatistics',
+                          token='41969E2AC0F047B42111176450B2ADB8',
+                          secret='vzjG1Ab7kdLIzR7mFTQW3uJdJnzhcsv5NBcanzXs')
 
 library(flexdashboard)
 library(shiny)
@@ -22,7 +22,7 @@ dat <- readRDS("full.rds")
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
 dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
-justice_list <- unique(dat$opinion)
+justice_list <- unique(dat$name)
 ```
 
 By Topic
@@ -58,12 +58,12 @@ Row
 renderPlot({
   req(!is.null(input$topic))
   
-  dat_subset <- dat[dat$topic %in% input$topic, c("opinion","topic")]
+  dat_subset <- dat[dat$topic %in% input$topic, c("name","topic")]
   melted_df <- as.data.frame(table(dat_subset))
   
   palette = scale_fill_brewer(palette = "Set1")
-  if(length(unique(dat_subset$opinion)) > 9){ 
-       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(unique(dat_subset$opinion))))
+  if(length(unique(dat_subset$name)) > 9){ 
+       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(unique(dat_subset$name))))
   }
   
 for(j in input$topic){
@@ -71,7 +71,7 @@ for(j in input$topic){
 }
   
   ggplot(melted_df) + 
-    geom_col(aes(x = reorder(topic, -table(topic)[topic]), y = percent, fill = opinion)) + 
+    geom_col(aes(x = reorder(topic, -table(topic)[topic]), y = percent, fill = name)) + 
     theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom") + 
     scale_y_continuous(limits = c(0, NA),expand = c(0,0)) + 
     labs(x = "Topic", y = "No. Cases", fill = "Justice\nDelivering\nOpinion") +
@@ -98,7 +98,7 @@ Row
 ```{r}
 renderPlot({
   ggplot(dat) + 
-    geom_bar(aes(x = reorder(opinion, datesen))) + 
+    geom_bar(aes(x = reorder(name, datesen))) + 
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
     scale_y_continuous(expand = c(0,5)) + 
     labs(x = "Justice", y = "No. Times Justice Delivered Opinion")
@@ -117,10 +117,10 @@ renderPlot({
        palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(input$justice)))
   }
   
-  dat_subset <- dat[dat$opinion %in% input$justice, c("opinion", "topic")]
+  dat_subset <- dat[dat$name %in% input$justice, c("name", "topic")]
   melted_df <- as.data.frame(table(dat_subset))
   ggplot(melted_df) + 
-    geom_col(aes(x = topic, y = Freq, fill = opinion), position = "dodge") + 
+    geom_col(aes(x = topic, y = Freq, fill = name), position = "dodge") + 
     theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), panel.grid.major.y = element_line(color = "grey90")) +
     scale_y_continuous(limits = c(NA,NA),expand = c(0,0)) +
     geom_text(aes(x = 1,y=Freq + 1, label="")) +
