@@ -3,7 +3,7 @@ title: "Supreme Court Decisions"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
-    vertical_layout: fill
+    vertical_layout: scroll
     theme: spacelab
 runtime: shiny
 ---
@@ -21,10 +21,46 @@ library(magrittr)
 library(dplyr)
 
 dat <- readRDS("full.rds")
+
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
 dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
 justice_list <- unique(dat$opinion)
+
+#making birthplace list 
+
+for(i in 1:length(dat$birthst)){
+if(dat$birthst[i] %in% c(19,21,39,7,29,45,32,38,30,8,20,51)){
+  dat$region[i]<- "Northeast"
+} else if(dat$birthst[i] %in% c(48,46,17,42,33,40,10,1,24,4,18,9)){
+  dat$region[i]<-"Southeast"
+}else if(dat$birthst[i] %in% c(35,14,22,13,25,49,23,15,16,27,41,34)){
+  dat$region[i]<- "Midwest"
+}else if(dat$birthst[i] %in% c(43,36,31,3)){
+  dat$region[i]<- "Southwest"
+}else if (dat$birthst[i] %in% c(6,50,26,12,47,37,44,28,5,2,11)){
+  dat$region[i]<-"West"
+}else if(dat$birthst[i] %in% c(52,53,54,55,56,57,58)){
+  dat$region[i]<-"International"
+}
+}
+region_list<- unique(dat$region)
+
+#making the socioeconomic status list
+
+for(i in 1:length(dat$famses)){
+if(!is.na(dat$famses[i])&dat$famses[i] == 1){
+  dat$famses[i]<- "Lower"
+}else if (!is.na(dat$famses[i])&dat$famses[i] %in% c(2,3,4)){
+  dat$famses[i]<- "Middle"
+}else if(!is.na(dat$famses[i])&dat$famses[i] == 5){
+  dat$famses[i]<-"Upper"
+}else{
+  dat$famses[i]<- "Unknown"
+}
+}
+
+ses_list<-unique(dat$famses)
 ```
 
 By Topic
@@ -52,59 +88,6 @@ renderPlot({
 })
 ```
 
-
-Row
------------------------------------------------------------------------
-
-```{r}
-renderPlot({
-  req(!is.null(input$topic))
-  
-  dat_subset <- dat[dat$topic %in% input$topic,]
-  
-
-
-for(i in 1:length(dat_subset$birthst)){
-if(dat_subset$birthst[i] %in% c(19,21,39,7,29,45,32,38,30,8,20,51)){
-  dat_subset$region[i]<- "Northeast"
-} else if(dat_subset$birthst[i] %in% c(48,46,17,42,33,40,10,1,24,4,18,9)){
-  dat_subset$region[i]<-"Southeast"
-}else if(dat_subset$birthst[i] %in% c(35,14,22,13,25,49,23,15,16,27,41,34)){
-  dat_subset$region[i]<- "Midwest"
-}else if(dat_subset$birthst[i] %in% c(43,36,31,3)){
-  dat_subset$region[i]<- "Southwest"
-}else if (dat_subset$birthst[i] %in% c(6,50,26,12,47,37,44,28,5,2,11)){
-  dat_subset$region[i]<-"West"
-}else if(dat_subset$birthst[i] %in% c(52,53,54,55,56,57,58)){
-  dat_subset$region[i]<-"International"
-}
-}
-
-for(i in 1:length(dat_subset$famses)){
-if(dat_subset$famses[i] == 1){
-  dat_subset$famses[i]<- "Lower"
-}
-else if (dat_subset$famses[i] %in% c(2,3,4)){
-  dat_subset$famses[i]<- "Middle"
-}
-else if(dat_subset$famses[i] ==5){
-  dat_subset$famses[i]<-"Upper"
-}
-else{
-  dat_subset$famses[i]<- "Unknown"
-}
-}
-
-
-
-
-plot<-ggplot(dat_subset%>% count(region,famses), aes(region,n,fill=famses))
-plot+geom_bar(stat="identity")+labs(x="Birth Region of Justice Writing the Opinion", 
-                                    y="Number of Opinions 
-                                    Written")+guides(fill=guide_legend(title=
-                                    "Family's Socioeconomic Status"))
-})
-```
 
 Row
 -----------------------------------------------------------------------
@@ -180,5 +163,60 @@ renderPlot({
     geom_text(aes(x = 1,y=Freq + 1, label="")) +
     labs(x = "Topic", y = "No. Cases", fill = "Justice Delivering Opinion") +
     palette
+})
+```
+
+Birth Region and Family's Socioeconomic Status
+================================================================
+
+Column {.sidebar}
+----------------------------------------------------------------
+
+#### Set Parameters
+```{r}
+selectInput("Birth_Region", "Birth Region:",
+            choices =region_list, selected = NULL, multiple = T)
+
+selectInput("Family_Socioeconomic_Status", label ="Family's Socioeconomic Status",choices= ses_list, selected = NULL, multiple = T)
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+unique_justices_dat<- dat[!duplicated(dat$name),] 
+
+plot<-ggplot(unique_justices_dat%>% count(region,famses), aes(region,n,fill=famses))
+plot+geom_bar(stat="identity")+labs(y="Number of Justices",x="Region of Birth")+guides(fill=guide_legend(title="Family's Socioeconomic Status"))
+
+})
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+ if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
+  
+
+  dat_subset <- dat[dat$region %in% c(input$Birth_Region),]
+  
+  ggplot(dat_subset %>% count(topic,famses),aes(topic,n,fill=famses))+geom_bar(
+    stat="identity")+labs(,y="Number of opinions written",x="Topic")+guides(fill=guide_legend(title="Family's Socioeconomic Status"))+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
+  
+ }else if (is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
+   dat_subset_1<- dat[dat$famses %in% c(input$Family_Socioeconomic_Status),]
+   
+   ggplot(dat_subset_1 %>% count(topic,region),aes(topic,n,fill=region))+geom_bar(
+    stat="identity")+labs(y="Number of opinions written",x="Topic")+guides(fill=guide_legend(title="Region of Birth"))+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
+ }else if (!is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
+   
+   dat_subset_2<- dat[dat$region %in% c(input$Birth_Region),]
+   dat_subset_3<- dat_subset_2[dat_subset_2$famses %in% c(input$Family_Socioeconomic_Status),]
+   
+   ggplot(dat_subset_3 %>% count(topic),aes(topic,n))+geom_bar(stat="identity")+labs(y="Number of opinions written",x="Topic")+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
+ }
 })
 ```
