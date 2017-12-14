@@ -19,10 +19,13 @@ library(lubridate)
 library(RColorBrewer)
 
 dat <- readRDS("full.rds")
+dat_sub <- readRDS("full_subset.rds")
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
-dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
+dat$datenom<- as.Date(dat$datenom,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
 justice_list <- unique(dat$name)
+party_list <- unique(dat_sub$pres_party)
+religion_list <- unique(dat_sub$religion)
 ```
 
 By Topic
@@ -98,10 +101,11 @@ Row
 ```{r}
 renderPlot({
   ggplot(dat) + 
-    geom_bar(aes(x = reorder(name, datesen))) + 
+    geom_bar(aes(x = reorder(name, datenom))) + 
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
     scale_y_continuous(expand = c(0,5)) + 
-    labs(x = "Justice", y = "No. Times Justice Delivered Opinion")
+    labs(x = "Justice", y = "No. Times Justice Delivered Opinion",
+         caption = "Justices ordered by date of nomination (or recess appointment), through 1993")
 })
 ```
 
