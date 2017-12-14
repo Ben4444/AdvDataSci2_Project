@@ -810,3 +810,7 @@ full_subset <- subset(full, prespart == 1 | prespart == 6)
 full_subset <- subset(full_subset, yrdecided >= 1933)
 
 saveRDS(full_subset, "full_subset.rds")
+
+full_sub_pr <- as.data.frame(tally(group_by(full_subset, religion, pres_party, topic)))
+
+saveRDS(full_sub_pr, "full_sub_pr.rds")
