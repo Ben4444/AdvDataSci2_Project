@@ -773,3 +773,40 @@ full$name <- as.character(full$name)
 full$name[full$opinion == "Per curiam"] <- "Per curiam"
 
 saveRDS(full, "full.rds")
+
+full <- readRDS("full.rds")
+
+# Coding in Nominating President's Party name
+full$pres_party[full$prespart == 1] <- "Democrat"
+full$pres_party[full$prespart == 2] <- "Democratic Republican"
+full$pres_party[full$prespart == 3] <- "Federalist"
+full$pres_party[full$prespart == 4] <- "Free Soil"
+full$pres_party[full$prespart == 5] <- "Independent"
+full$pres_party[full$prespart == 6] <- "Republican"
+full$pres_party[full$prespart == 7] <- "Whig"
+
+# Coding in Justice's religion
+full$religion[full$nomrelig == 1] <- "Baptist"
+full$religion[full$nomrelig == 2] <- "Church of England"
+full$religion[full$nomrelig == 3] <- "Congregationalist"
+full$religion[full$nomrelig == 4] <- "Disciples of Christ"
+full$religion[full$nomrelig == 5] <- "Dutch Reform"
+full$religion[full$nomrelig == 6] <- "Episcopalian"
+full$religion[full$nomrelig == 7] <- "Jewish"
+full$religion[full$nomrelig == 8] <- "Lutheran"
+full$religion[full$nomrelig == 9] <- "Methodist"
+full$religion[full$nomrelig == 10] <- "Presbyterian"
+full$religion[full$nomrelig == 11] <- "Protestant"
+full$religion[full$nomrelig == 12] <- "Quaker"
+full$religion[full$nomrelig == 13] <- "Roman Catholic"
+full$religion[full$nomrelig == 14] <- "Unitarian"
+
+saveRDS(full, "full.rds")
+
+# Subsetting the dataset to only Democratic or Republican nominating presidents
+full_subset <- subset(full, prespart == 1 | prespart == 6)
+
+# Subsetting the dataset to only cases decided from 1933 and on, which marked the development of modern American political positions
+full_subset <- subset(full_subset, yrdecided >= 1933)
+
+saveRDS(full_subset, "full_subset.rds")

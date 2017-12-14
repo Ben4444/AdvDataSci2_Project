@@ -5,8 +5,8 @@ account: jhubiostatistics
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 245242
-bundleId: 1119317
+bundleId: 1132967
 url: https://jhubiostatistics.shinyapps.io/supreme_court_dash/
-when: 1512585343.83545
+when: 1513187148.56146
 asMultiple: FALSE
 asStatic: FALSE
