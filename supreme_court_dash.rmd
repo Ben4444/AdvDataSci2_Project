@@ -64,7 +64,6 @@ if(!is.na(dat$famses[i])&dat$famses[i] == 1){
 
 ses_list<-unique(dat$famses)
 
-justice_list <- unique(dat$name)
 party_list <- unique(dat_sub$pres_party)
 religion_list <- unique(dat_sub$religion)
 ```
