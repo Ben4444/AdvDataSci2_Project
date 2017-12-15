@@ -22,6 +22,9 @@ library(dplyr)
 
 dat <- readRDS("full.rds")
 
+dat_sub <- readRDS("full_subset.rds")
+dat_sub_pr <- readRDS("full_sub_pr.rds")
+
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
 dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
@@ -61,6 +64,10 @@ if(!is.na(dat$famses[i])&dat$famses[i] == 1){
 }
 
 ses_list<-unique(dat$famses)
+
+justice_list <- unique(dat$name)
+party_list <- unique(dat_sub$pres_party)
+religion_list <- unique(dat_sub$religion)
 ```
 
 By Topic
