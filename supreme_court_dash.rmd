@@ -22,13 +22,12 @@ library(dplyr)
 
 dat <- readRDS("full.rds")
 
-dat_sub <- readRDS("full_subset.rds")
-dat_sub_pr <- readRDS("full_sub_pr.rds")
+
 
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
 dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
-justice_list <- unique(dat$opinion)
+justice_list <- unique(dat$name)
 
 #making birthplace list 
 
