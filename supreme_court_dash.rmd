@@ -8,9 +8,9 @@ output:
 runtime: shiny
 ---
 ```{r setup, include=FALSE}
-#rsconnect::setAccountInfo(name='jhubiostatistics',
-#                          token='41969E2AC0F047B42111176450B2ADB8',
-#                          secret='vzjG1Ab7kdLIzR7mFTQW3uJdJnzhcsv5NBcanzXs')
+rsconnect::setAccountInfo(name='jhubiostatistics',
+                          token='41969E2AC0F047B42111176450B2ADB8',
+                          secret='vzjG1Ab7kdLIzR7mFTQW3uJdJnzhcsv5NBcanzXs')
 
 library(flexdashboard)
 library(shiny)
@@ -21,8 +21,10 @@ library(magrittr)
 library(dplyr)
 
 dat <- readRDS("full.rds")
+dat_sub <- readRDS("full_subset.rds")
+dat_sub_pr <- readRDS("full_sub_pr.rds")
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
-dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
+dat$datenom<- as.Date(dat$datenom,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
 justice_list <- unique(dat$name)
 party_list <- unique(dat_sub$pres_party)
@@ -63,6 +65,8 @@ if(!is.na(dat$famses[i])&dat$famses[i] == 1){
 
 ses_list<-unique(dat$famses)
 
+
+
 ```
 
 By Topic
@@ -84,7 +88,8 @@ Row
 renderPlot({
   ggplot(dat) + 
     geom_bar(aes(x = reorder(topic, -table(topic)[topic]))) + 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
+          axis.title = element_text(size = 15)) + 
     scale_y_continuous(expand = c(0,5)) + 
     labs(x = "Topic", y = "No. Cases")
 })
@@ -98,12 +103,12 @@ Row
 renderPlot({
   req(!is.null(input$topic))
   
-  dat_subset <- dat[dat$topic %in% input$topic, c("opinion","topic")]
+  dat_subset <- dat[dat$topic %in% input$topic, c("name","topic")]
   melted_df <- as.data.frame(table(dat_subset))
   
   palette = scale_fill_brewer(palette = "Set1")
-  if(length(unique(dat_subset$opinion)) > 9){ 
-       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(unique(dat_subset$opinion))))
+  if(length(unique(dat_subset$name)) > 9){ 
+       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(unique(dat_subset$name))))
   }
   
 for(j in input$topic){
@@ -111,10 +116,11 @@ for(j in input$topic){
 }
   
   ggplot(melted_df) + 
-    geom_col(aes(x = reorder(topic, -table(topic)[topic]), y = percent, fill = opinion)) + 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom") + 
+    geom_col(aes(x = reorder(topic, -table(topic)[topic]), y = percent, fill = name)) + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
+          axis.title = element_text(size = 15), legend.position = "bottom") + 
     scale_y_continuous(limits = c(0, NA),expand = c(0,0)) + 
-    labs(x = "Topic", y = "No. Cases", fill = "Justice\nDelivering\nOpinion") +
+    labs(x = "Topic", y = "Percent of Cases", fill = "Justice\nDelivering\nOpinion") +
     palette
 })
 ```
@@ -137,10 +143,12 @@ Row
 ```{r}
 renderPlot({
   ggplot(dat) + 
-    geom_bar(aes(x = reorder(opinion, datesen))) + 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+    geom_bar(aes(x = reorder(name, datenom))) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
+          axis.title = element_text(size = 13)) + 
     scale_y_continuous(expand = c(0,5)) + 
-    labs(x = "Justice", y = "No. Times Justice Delivered Opinion")
+    labs(x = "Justice", y = "No. Times Justice Delivered Opinion",
+         caption = "Justices ordered by date of nomination (or recess appointment), through 1993.")
 })
 ```
 
@@ -156,18 +164,101 @@ renderPlot({
        palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(input$justice)))
   }
   
-  dat_subset <- dat[dat$opinion %in% input$justice, c("opinion", "topic")]
+  dat_subset <- dat[dat$name %in% input$justice, c("name", "topic")]
   melted_df <- as.data.frame(table(dat_subset))
   ggplot(melted_df) + 
-    geom_col(aes(x = topic, y = Freq, fill = opinion), position = "dodge") + 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), panel.grid.major.y = element_line(color = "grey90")) +
+    geom_col(aes(x = topic, y = Freq, fill = name), position = "dodge") + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
+          legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
+          panel.grid.major.y = element_line(color = "grey90")) +
     scale_y_continuous(limits = c(NA,NA),expand = c(0,0)) +
     geom_text(aes(x = 1,y=Freq + 1, label="")) +
-    labs(x = "Topic", y = "No. Cases", fill = "Justice Delivering Opinion") +
+    labs(x = "Topic", y = "No. Cases", fill = "Justice Delivering Opinion:") +
     palette
 })
 ```
 
+By Political Party and Religion
+================================================================
+
+Column {.sidebar}
+----------------------------------------------------------------
+
+#### Set Parameters
+```{r}
+selectInput("party", label = "Nominating President's Party:",
+            choices = party_list, selected = NULL, multiple = T)
+
+selectInput("religion", label = "Justice's Religion:",
+            choices = religion_list, selected = NULL, multiple = T)
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+dat_sub$Party <- dat_sub$pres_party
+renderPlot({
+  ggplot(dat_sub) + 
+    geom_bar(aes(x = name, fill = religion, alpha = Party)) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
+          axis.title = element_text(size = 15), legend.position = "top") + 
+    scale_y_continuous(expand = c(0,5)) + 
+    scale_alpha_manual(values=c(0.4, 1)) +
+    guides(fill = guide_legend(title = "Justice's Religion")) + 
+    labs(x = "Justice", y = "No. Times Justice Delivered Opinion",
+         caption = "Justices restricted to those nominated by Republican or Democratic presidents in the modern political era (1933 - 2015).")
+})
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+  req(!is.null(input$party))
+  
+  palette = scale_fill_brewer(palette = "Set2")
+  
+  dat_subset <- dat_sub[dat_sub$pres_party %in% input$party, c("pres_party", "topic")]
+  melted_df <- as.data.frame(table(dat_subset))
+  ggplot(melted_df) + 
+    geom_col(aes(x = topic, y = Freq, fill = pres_party), position = "dodge") + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11),
+          legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
+          panel.grid.major.y = element_line(color = "grey90")) +
+    scale_y_continuous(limits = c(NA,NA), expand = c(0,0)) +
+    geom_text(aes(x = 1, y = Freq + 1, label="")) +
+    labs(x = "Topic", y = "No. Cases", fill = "Nominating President's Party:") +
+    palette
+})
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+renderPlot({
+  req(!is.null(input$religion))
+  
+  palette = scale_fill_brewer(palette = "Set2")
+  if(length(input$religion) > 9){ 
+       palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(input$religion)))
+  }
+  
+  dat_subset <- dat_sub[dat_sub$religion %in% input$religion, c("religion", "topic")]
+  melted_df <- as.data.frame(table(dat_subset))
+  ggplot(melted_df) + 
+    geom_col(aes(x = topic, y = Freq, fill = religion), position = "dodge") + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11),
+          legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
+          panel.grid.major.y = element_line(color = "grey90")) +
+    scale_y_continuous(limits = c(NA,NA), expand = c(0,0)) +
+    geom_text(aes(x = 1, y = Freq + 1, label="")) +
+    labs(x = "Topic", y = "No. Cases", fill = "Justice's Religion:") +
+    palette
+})
+```
 Birth Region and Family's Socioeconomic Status
 ================================================================
 
@@ -221,4 +312,4 @@ renderPlot({
    ggplot(dat_subset_3 %>% count(topic),aes(topic,n))+geom_bar(stat="identity")+labs(y="Number of opinions written",x="Topic")+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
  }
 })
-```
+
