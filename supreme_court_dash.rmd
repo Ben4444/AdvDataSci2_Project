@@ -296,7 +296,7 @@ renderPlot({
   dat_subset <- dat[dat$region %in% c(input$Birth_Region),]
   
   ggplot(dat_subset %>% count(topic,famses),aes(topic,n,fill=famses))+geom_bar(
-    stat="identity")+labs(,y="Number of opinions written",x="Topic")+guides(fill=guide_legend(title="Family's Socioeconomic Status"))+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
+    stat="identity")+labs(y="Number of opinions written",x="Topic")+guides(fill=guide_legend(title="Family's Socioeconomic Status"))+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
   
  }else if (is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
    dat_subset_1<- dat[dat$famses %in% c(input$Family_Socioeconomic_Status),]
