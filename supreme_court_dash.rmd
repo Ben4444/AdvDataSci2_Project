@@ -29,6 +29,42 @@ topic_list <- unique(dat$topic)
 justice_list <- unique(dat$name)
 party_list <- unique(dat_sub$pres_party)
 religion_list <- unique(dat_sub$religion)
+
+
+#making birthplace list 
+
+for(i in 1:length(dat$birthst)){
+if(dat$birthst[i] %in% c(19,21,39,7,29,45,32,38,30,8,20,51)){
+  dat$region[i]<- "Northeast"
+} else if(dat$birthst[i] %in% c(48,46,17,42,33,40,10,1,24,4,18,9)){
+  dat$region[i]<-"Southeast"
+}else if(dat$birthst[i] %in% c(35,14,22,13,25,49,23,15,16,27,41,34)){
+  dat$region[i]<- "Midwest"
+}else if(dat$birthst[i] %in% c(43,36,31,3)){
+  dat$region[i]<- "Southwest"
+}else if (dat$birthst[i] %in% c(6,50,26,12,47,37,44,28,5,2,11)){
+  dat$region[i]<-"West"
+}else if(dat$birthst[i] %in% c(52,53,54,55,56,57,58)){
+  dat$region[i]<-"International"
+}
+}
+region_list<- unique(dat$region)
+
+#making the socioeconomic status list
+
+for(i in 1:length(dat$famses)){
+if(!is.na(dat$famses[i])&dat$famses[i] == 1){
+  dat$famses[i]<- "Lower"
+}else if (!is.na(dat$famses[i])&dat$famses[i] %in% c(2,3,4)){
+  dat$famses[i]<- "Middle"
+}else if(!is.na(dat$famses[i])&dat$famses[i] == 5){
+  dat$famses[i]<-"Upper"
+}else{
+  dat$famses[i]<- "Unknown"
+}
+}
+
+ses_list<-unique(dat$famses)
 ```
 
 By Topic
