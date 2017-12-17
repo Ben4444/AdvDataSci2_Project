@@ -21,13 +21,12 @@ library(magrittr)
 library(dplyr)
 
 dat <- readRDS("full.rds")
-
-
-
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
 dat$datesen<- as.Date(dat$datesen,format="%m/%d/%Y")
 topic_list <- unique(dat$topic)
 justice_list <- unique(dat$name)
+party_list <- unique(dat_sub$pres_party)
+religion_list <- unique(dat_sub$religion)
 
 #making birthplace list 
 
@@ -64,8 +63,6 @@ if(!is.na(dat$famses[i])&dat$famses[i] == 1){
 
 ses_list<-unique(dat$famses)
 
-party_list <- unique(dat_sub$pres_party)
-religion_list <- unique(dat_sub$religion)
 ```
 
 By Topic
