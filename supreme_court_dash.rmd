@@ -7,6 +7,7 @@ output:
     theme: spacelab
 runtime: shiny
 ---
+
 ```{r setup, include=FALSE}
 rsconnect::setAccountInfo(name='jhubiostatistics',
                           token='41969E2AC0F047B42111176450B2ADB8',
@@ -66,6 +67,13 @@ if(!is.na(dat$famses[i])&dat$famses[i] == 1){
 
 ses_list<-unique(dat$famses)
 ```
+
+Introduction
+=======================================================================
+* Where was data collected
+* What is the data
+* How to navigate the Shiny
+
 
 By Topic
 =======================================================================
@@ -146,12 +154,8 @@ renderPlot({
     theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
           axis.title = element_text(size = 13)) + 
     scale_y_continuous(expand = c(0,5)) + 
-<<<<<<< HEAD
-    labs(x = "Justice\n(ordered by year appointed", y = "No. Times Justice Delivered Opinion")
-=======
     labs(x = "Justice", y = "No. Times Justice Delivered Opinion",
          caption = "Justices ordered by date of nomination (or recess appointment), through 1993.")
->>>>>>> e2f98c5e21fd508624c6510cb124ce667a6afe5f
 })
 ```
 
@@ -181,7 +185,7 @@ renderPlot({
 })
 ```
 
-By Political Party and Religion
+Political Party and Religion
 ================================================================
 
 Column {.sidebar}
@@ -263,7 +267,7 @@ renderPlot({
 })
 ```
 
-Birth Region and Family's Socioeconomic Status
+Birth Region and Socioeconomic Status
 ================================================================
 
 Column {.sidebar}
