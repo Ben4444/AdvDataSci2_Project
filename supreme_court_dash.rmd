@@ -34,6 +34,9 @@ party_list <- unique(dat_sub$pres_party)
 religion_list <- unique(dat_sub$religion)
 dat$term <- dat$yrend - dat$yrnom
 dat$term[dat$name == "Per curiam"] <- 1
+dat_sub$term <- dat_sub$yrend - dat_sub$yrnom
+dat_sub$term[dat_sub$name == "Per curiam"] <- 1
+
 
 #making birthplace list 
 
@@ -198,7 +201,7 @@ renderPlot({
   dat_subset <- dat[dat$name %in% input$justice, c("name", "topic")]
   melted_df <- as.data.frame(table(dat_subset))
   ggplot(melted_df) + 
-    geom_col(aes(x = topic, y = Freq / term, fill = name), position = "dodge") + 
+    geom_col(aes(x = topic, y = Freq, fill = name), position = "dodge") + 
     theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
           legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
           panel.grid.major.y = element_line(color = "grey90")) +
@@ -231,7 +234,7 @@ Row
 dat_sub$Party <- dat_sub$pres_party
 renderPlot({
   ggplot(dat_sub) + 
-    geom_bar(aes(x = name, y = Freq / term, fill = religion, alpha = Party)) + 
+    geom_bar(aes(x = name, fill = religion, alpha = Party)) + 
     theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
           axis.title = element_text(size = 15), legend.position = "top") + 
     scale_y_continuous(expand = c(0,5)) + 
@@ -254,7 +257,7 @@ renderPlot({
   dat_subset <- dat_sub[dat_sub$pres_party %in% input$party, c("pres_party", "topic")]
   melted_df <- as.data.frame(table(dat_subset))
   ggplot(melted_df) + 
-    geom_col(aes(x = topic, y = Freq / term, fill = pres_party), position = "dodge") + 
+    geom_col(aes(x = topic, y = Freq, fill = pres_party), position = "dodge") + 
     theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11),
           legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
           panel.grid.major.y = element_line(color = "grey90")) +
@@ -280,7 +283,7 @@ renderPlot({
   dat_subset <- dat_sub[dat_sub$religion %in% input$religion, c("religion", "topic")]
   melted_df <- as.data.frame(table(dat_subset))
   ggplot(melted_df) + 
-    geom_col(aes(x = topic, y = Freq / term, fill = religion), position = "dodge") + 
+    geom_col(aes(x = topic, y = Freq, fill = religion), position = "dodge") + 
     theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11),
           legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
           panel.grid.major.y = element_line(color = "grey90")) +
