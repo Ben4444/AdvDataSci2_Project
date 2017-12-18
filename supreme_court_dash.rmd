@@ -94,7 +94,7 @@ The 'By Political Party and Religion' tab contains three possible graphs. The to
 In the final tab, 'Birth Region and Family's Socioeconomic Status', the top plot displays the number of Justices originating from certain U.S. region and socioeconomic status combinations. The bottom graph is controlled by the Birth Region and Family's Socioeconomic Status drop-down menus, where the plot will display the number of opinions delivered by justices from the regions or socieconomic status combinations selected by the user.
 
 
-We hope you have a Supreme-ly good time using our App!
+We hope you have a **Supreme-ly** good time using our App!
 
 
 By Topic
