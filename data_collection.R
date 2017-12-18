@@ -801,9 +801,29 @@ full$religion[full$nomrelig == 12] <- "Quaker"
 full$religion[full$nomrelig == 13] <- "Roman Catholic"
 full$religion[full$nomrelig == 14] <- "Unitarian"
 
+# September 30, 1857 Curtis
+full[full$name == "Curtis, Benjamin Robbins", "datesere"] <- "1857-09-30"
+
+
+
+full$decided<- as.Date(full$decided,format="%B %d, %Y")
+full$datenom<- as.Date(full$datenom,format="%m/%d/%Y")
+full$dateserb<- as.Date(full$dateserb,format="%m/%d/%Y")
+full$datesere<- as.Date(full$datesere,format="%m/%d/%Y")
+
+
+for(i in unique(sort(full$name))){
+ start <- (full[full$name == i,"dateserb"])[1]
+ end <- (full[full$name == i,"datesere"])[1]
+ if(is.na(end)){
+  end <- as.Date("12/31/2017", format="%m/%d/%Y")
+ }
+ full[full$name == i,"total_cases_seen"] <- sum(na.omit(full$decided > start & full$decided < end))
+}
+
 saveRDS(full, "full.rds")
 
-# Subsetting the dataset to only Democratic or Republican nominating presidents
+  # Subsetting the dataset to only Democratic or Republican nominating presidents
 full_subset <- subset(full, prespart == 1 | prespart == 6)
 
 # Subsetting the dataset to only cases decided from 1933 and on, which marked the development of modern American political positions

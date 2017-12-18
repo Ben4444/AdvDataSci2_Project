@@ -25,9 +25,7 @@ library(DT)
 
 dat <- readRDS("full.rds")
 dat_sub <- readRDS("full_subset.rds")
-dat_sub_pr <- readRDS("full_sub_pr.rds")
-dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
-dat$datenom<- as.Date(dat$datenom,format="%m/%d/%Y")
+
 topic_list <- unique(dat$topic)[order(unique(dat$topic))]
 justice_list <- unique(dat$name)
 party_list <- unique(dat_sub$pres_party)
@@ -36,7 +34,6 @@ dat$term <- dat$yrend - dat$yrnom
 dat$term[dat$name == "Per curiam"] <- 1
 dat_sub$term <- dat_sub$yrend - dat_sub$yrnom
 dat_sub$term[dat_sub$name == "Per curiam"] <- 1
-
 
 #making birthplace list 
 
@@ -235,17 +232,28 @@ Row
 -----------------------------------------------------------------------
 
 ```{r}
+# Normalize by # of cases the justice saw
+
 dat_sub$Party <- dat_sub$pres_party
+dat_sub[dat_sub$name == "Stone, Harlan Fiske", "Party"] <- "Both"
 renderPlot({
-  ggplot(dat_sub) + 
-    geom_bar(aes(x = name, fill = religion, alpha = Party)) + 
+  melted_df <- as.data.frame(table(dat_sub$name))
+  tmp <- unique(dat[,c("name","total_cases_seen")])
+  melted_df <- merge(melted_df, tmp, by.x = "Var1", by.y = "name")
+  melted_df$percent <- round(melted_df$Freq / melted_df$total_cases_seen, 4)*100
+  tmp <- merge(dat_sub, melted_df, by.x = "name", by.y = "Var1")
+  tmp <- unique(tmp[,c("name","percent","religion","Party")])
+  
+  
+  ggplot(tmp) + 
+    geom_col(aes(x = name, y = percent, fill = religion, alpha = Party)) + 
     theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
           axis.title = element_text(size = 15), legend.position = "top") + 
     scale_y_continuous(expand = c(0,5)) + 
-    scale_alpha_manual(values=c(0.4, 1)) +
+    scale_alpha_manual(values=c(0.4, 0.7, 1), limits = c("Democrat", "Both", "Republican")) +
     guides(fill = guide_legend(title = "Justice's Religion")) + 
-    labs(x = "Justice", y = "No. Times Justice Delivered Opinion",
-         caption = "Justices restricted to those nominated by Republican or Democratic presidents in the modern political era (1933 - 2015).")
+    labs(x = "Justice", y = "% Times Justice Delivered Opinion*",
+         caption = "Justices restricted to those nominated by Republican or Democratic presidents in the modern political era (1933 - 2015).\n*Number of times justice delivered opinion divided by total number of cases seen by court during justice's term, multiplied by 100.")
 })
 ```
 
