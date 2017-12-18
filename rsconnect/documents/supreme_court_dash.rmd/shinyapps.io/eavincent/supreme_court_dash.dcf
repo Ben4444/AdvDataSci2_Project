@@ -1,0 +1,12 @@
+name: supreme_court_dash
+title: supreme_court_dash
+username:
+account: eavincent
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 248338
+bundleId: 1132973
+url: https://eavincent.shinyapps.io/supreme_court_dash/
+when: 1513187257.31184
+asMultiple: FALSE
+asStatic: FALSE
