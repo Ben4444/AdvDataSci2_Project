@@ -71,7 +71,11 @@ ses_list<-unique(dat$famses)
 
 Introduction
 =======================================================================
-* Where was data collected
+This project takes a look at historical Supreme Court case topics and the Supreme Court Justices that delivered court opinions. Case data was collected from the Cornell University Law School Legal Information Institute website, https://www.law.cornell.edu/supct/cases/topic.htm, and in instances where a certain court case was not available, https://supreme.justia.com/ was used. Supreme Court Justice data was taken from the Washington University in St. Louis Supreme Court Justices Database http://scdb.wustl.edu/. 
+
+Data collected includes Supreme Court case topic as designated by the Cornell Legal Information Institute, Supreme Court Justice delivering opinion, 
+
+
 * What is the data
 * How to navigate the Shiny
 
