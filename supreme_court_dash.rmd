@@ -70,13 +70,19 @@ ses_list<-unique(dat$famses)
 
 Introduction
 =======================================================================
-This project takes a look at historical Supreme Court case topics and the Supreme Court Justices that delivered court opinions. Case data was collected from the Cornell University Law School Legal Information Institute website, https://www.law.cornell.edu/supct/cases/topic.htm, and in instances where a certain court case was not available, https://supreme.justia.com/ was used. Supreme Court Justice data was taken from the Washington University in St. Louis Supreme Court Justices Database http://scdb.wustl.edu/. 
+This project takes a look at historical United States Supreme Court case topics and the Supreme Court Justices that delivered court opinions. Case data was collected from the Cornell University Law School Legal Information Institute website, https://www.law.cornell.edu/supct/cases/topic.htm, and in instances where a certain court case was not available, https://supreme.justia.com/ was used. Supreme Court Justice data was taken from the Washington University in St. Louis Supreme Court Justices Database http://scdb.wustl.edu/. 
 
-Data collected includes Supreme Court case topic as designated by the Cornell Legal Information Institute, Supreme Court Justice delivering opinion, 
+Data collected includes Supreme Court case topic as designated by the Cornell Legal Information Institute, Supreme Court Justice delivering opinion, and a variety of sociodemographic information for each Supreme Court Justice, including nominating President's political party, Justice's religion, Justice's socioeconomic status in childhood, and Justice's geographic region of childhood upbringing. 
 
+This App is designed to be very user-friendly. To begin, in the 'By Topic' tab, the top graph displays the number of times the U.S. Supreme Court ruled on a particular topic. For the bottom graph, a user may type or select a Supreme Court case topic from the drop-down menu, where a plot displaying the Justices who delivered the opinion on that topic will appear, as well as a table detailing the breakdown of specific case information for that particular topic.
 
-* What is the data
-* How to navigate the Shiny
+Within the 'By Justice' tab, the top graph shows the number of times a Supreme Court Justice delivered a case opinion. To interact with the bottom graph, one or many Supreme Court Justices may be selected, and a plot will display the case topics the justice(s) delivered the court opiinions for.
+
+The 'By Political Party and Religion' tab contains three possible graphs. The top display shows a Supreme Court Justice's religion and nominating President's political party, and the number of times they delivered a Supreme Court opinion. If one selects one or multiple political parties from the drop-down, a chart displaying the frequency of topics ruled upon by Justices nominated within the respective political parties will appear. Finally, selection of one or multiple Justice religions from the drop-down will generate a plot showing the frequency of topic opinions provided by Justices from those particular religions.
+
+In the final tab, 'Birth Region and Family's Socioeconomic Status', the top plot displays the number of Justices originating from certain U.S. region and socioeconomic status combinations. The bottom graph is controlled by the Birth Region and Family's Socioeconomic Status drop-down menus, where the plot will display topic frequency of opinions delivered by justices from the regions or socieconomic status combinations selected by the user.
+
+We hope you have a Supreme-ly good time using our App!
 
 
 By Topic
