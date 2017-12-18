@@ -258,6 +258,7 @@ renderPlot({
     palette
 })
 ```
+
 Birth Region and Family's Socioeconomic Status
 ================================================================
 
