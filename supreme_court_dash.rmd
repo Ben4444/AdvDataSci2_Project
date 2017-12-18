@@ -20,17 +20,18 @@ library(lubridate)
 library(RColorBrewer)
 library(magrittr)
 library(dplyr)
+library(stringr)
 
 dat <- readRDS("full.rds")
 dat_sub <- readRDS("full_subset.rds")
 dat_sub_pr <- readRDS("full_sub_pr.rds")
 dat$decided<- as.Date(dat$decided,format="%B %d, %Y")
 dat$datenom<- as.Date(dat$datenom,format="%m/%d/%Y")
-topic_list <- unique(dat$topic)
+topic_list <- unique(dat$topic)[order(unique(dat$topic))]
 justice_list <- unique(dat$name)
 party_list <- unique(dat_sub$pres_party)
 religion_list <- unique(dat_sub$religion)
-
+dat$term <- dat$yrend - dat$yrnom
 
 #making birthplace list 
 
@@ -84,7 +85,7 @@ Column {.sidebar}
 #### Set Parameters
 ```{r}
 selectInput("topic", label = "Topic:",
-            choices = topic_list, selected = NULL, multiple = T)
+            choices = topic_list, selected = NULL)
 ```
 
 Row
@@ -109,25 +110,30 @@ Row
 renderPlot({
   req(!is.null(input$topic))
   
-  dat_subset <- dat[dat$topic %in% input$topic, c("name","topic")]
-  melted_df <- as.data.frame(table(dat_subset))
+  dat_subset <- dat[dat$topic == input$topic, c("name","topic")]
   
   palette = scale_fill_brewer(palette = "Set1")
   if(length(unique(dat_subset$name)) > 9){ 
        palette = scale_fill_manual(values = colorRampPalette(colors=brewer.pal(9, "Set1"))(length(unique(dat_subset$name))))
   }
-  
-for(j in input$topic){
-  melted_df[melted_df$topic == j,"percent"] <- melted_df[melted_df$topic == j,"Freq"]*100 / sum(melted_df[melted_df$topic == j,"Freq"])
-}
-  
-  ggplot(melted_df) + 
-    geom_col(aes(x = reorder(topic, -table(topic)[topic]), y = percent, fill = name)) + 
+
+  ggplot(dat_subset) + 
+    geom_bar(aes(x = name, fill = name)) + 
     theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
-          axis.title = element_text(size = 15), legend.position = "bottom") + 
+          axis.title = element_text(size = 15), legend.position = "none", plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.75, unit = "cm"), plot.title = element_text(hjust = 0.5, size = 16)) + 
     scale_y_continuous(limits = c(0, NA),expand = c(0,0)) + 
-    labs(x = "Topic", y = "Percent of Cases", fill = "Justice\nDelivering\nOpinion") +
+    labs(x = "Justice Delivering Opinion", y = "No. of Cases") +
+    ggtitle(str_to_title(input$topic)) +
     palette
+})
+  
+  
+DT::renderDataTable({
+  req(input$topic)
+  dat_subset <- dat[dat$topic %in% input$topic, c("topic", "case", "decided","name")]
+  summary <- dat_subset[order(dat_subset$topic),]
+  colnames(summary) <- c("Topic", "Case", "Date Decided", "Justice Delivering Opinion")
+  summary  
 })
 ```
 
@@ -285,6 +291,7 @@ Row
 -----------------------------------------------------------------------
 
 ```{r}
+# Make sizde by sie
 renderPlot({
 unique_justices_dat<- dat[!duplicated(dat$name),] 
 
@@ -298,6 +305,7 @@ Row
 -----------------------------------------------------------------------
 
 ```{r}
+# Normalize by # of cases
 renderPlot({
  if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
   
