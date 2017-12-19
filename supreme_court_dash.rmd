@@ -201,7 +201,6 @@ renderPlot({
           legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
           panel.grid.major.y = element_line(color = "grey90")) +
     scale_y_continuous(limits = c(NA,NA),expand = c(0,0)) +
-    geom_text(aes(x = 1,y=Freq + 1, label="")) +
     labs(x = "Topic", y = "Percent of Cases*", fill = "Justice Delivering Opinion:", caption = "*Number of opinions justice delivered for a given topic divided by the total number of opinions that justice delivered, multiplied by 100.") +
     palette
 })
