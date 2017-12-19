@@ -340,50 +340,78 @@ Row
 -----------------------------------------------------------------------
 
 ```{r}
+dat_subset <- reactive({
+  if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
+    
+    dat[dat$region %in% c(input$Birth_Region),] %>% count(topic,famses)
+    
+  }else if (is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
+   
+   dat[dat$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic,region)
+    
+  }else if (!is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
+   
+   dat_subset_2 <- dat[dat$region %in% c(input$Birth_Region),]
+   dat_subset_2[dat_subset_2$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic)
+  }
+})
+
+upper <- reactive({
+  if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
+    
+    max(dat[dat$region %in% c(input$Birth_Region),] %>% count(topic) %>% select(n) + 1)
+    
+  }else if (is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
+   
+   max(dat[dat$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic) %>% select(n) + 1)
+    
+  }else if (!is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
+   
+   dat_subset_2 <- dat[dat$region %in% c(input$Birth_Region),]
+   dat_subset_3 <- dat_subset_2[dat_subset_2$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic)
+   max(dat_subset_3$n) + 1
+  }
+})
+
+
 renderPlot({
   req(!is.null(input$Birth_Region) | !is.null(input$Family_Socioeconomic_Status))
+  
+  validate(
+    need(nrow(dat_subset()) > 0, paste("There are no", input$Birth_Region, "justices of", input$Family_Socioeconomic_Status, "socioeconomic status."))
+  )
   
   labels <- labs(y = "Number of Opinions Written", x = "Topic", caption = "Data represent raw counts and are not normalized for the number of total opinions written on a particular topic through the court's history.")
   my_theme <- theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), legend.position = c(1, 1), legend.justification = c(1, 1))
   
- if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
-
-  dat_subset <- dat[dat$region %in% c(input$Birth_Region),] %>% count(topic,famses)
-  upper <- max(dat[dat$region %in% c(input$Birth_Region),] %>% count(topic) %>% select(n) + 1)
+  if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
   
-  ggplot(dat_subset, aes(x = topic, y = n, fill = famses)) + 
+  ggplot(dat_subset(), aes(x = topic, y = n, fill = famses)) + 
     geom_bar(stat = "identity") +
     guides(fill = guide_legend(title = "Family's Socioeconomic Status")) +
     theme_bw() +
     labels +
     my_theme +
-    scale_y_continuous(limits = c(NA, upper), expand = c(0,0))
+    scale_y_continuous(limits = c(NA, upper()), expand = c(0,0))
       
  }else if (is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
    
-   dat_subset_1<- dat[dat$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic,region)
-   upper <- max(dat[dat$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic) %>% select(n) + 1)
-   
-   ggplot(dat_subset_1, aes(x = topic, y = n, fill = region)) + 
+   ggplot(dat_subset(), aes(x = topic, y = n, fill = region)) + 
      geom_bar(stat = "identity") +
      guides(fill = guide_legend(title = "Region of Birth")) +
      theme_bw() +
      labels +
      my_theme +
-     scale_y_continuous(limits = c(NA, upper), expand = c(0,0))
+     scale_y_continuous(limits = c(NA, upper()), expand = c(0,0))
 
  }else if (!is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
    
-   dat_subset_2<- dat[dat$region %in% c(input$Birth_Region),]
-   dat_subset_3<- dat_subset_2[dat_subset_2$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic)
-   upper <- max(dat_subset_3$n) + 1
-   
-   ggplot(dat_subset_3, aes(x = topic, y = n)) +
-     geom_bar(stat = "identity") +
-     theme_bw() +
-     labels +
-     my_theme +
-     scale_y_continuous(limits = c(NA, upper), expand = c(0,0))
+     ggplot(dat_subset(), aes(x = topic, y = n)) +
+      geom_bar(stat = "identity") +
+      theme_bw() +
+      labels +
+      my_theme +
+      scale_y_continuous(limits = c(NA, upper()), expand = c(0,0))
  }
 })
 ```
