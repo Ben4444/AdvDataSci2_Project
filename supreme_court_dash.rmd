@@ -83,7 +83,7 @@ This App is designed to be very user-friendly. To begin, in the 'By Topic' tab, 
 
 Within the 'By Justice' tab, the top graph shows the number of times a Supreme Court Justice delivered a case opinion. To interact with the bottom graph, one or many Supreme Court Justices may be selected, and a plot will display the case topics the justice(s) delivered the court opinions for.
 
-The 'By Political Party and Religion' tab contains three possible graphs. The top display shows a Supreme Court Justice's religion and nominating President's political party, and the number of times they delivered a Supreme Court opinion. If one selects one or multiple political parties from the drop-down, a chart displaying the frequency of topics ruled upon by Justices nominated within the respective political parties will appear. Finally, selection of one or multiple Justice religions from the drop-down will generate a plot showing the frequency of topic opinions provided by Justices from those particular religions.
+The 'Political Party and Religion' tab contains three possible graphs. The top display shows a Supreme Court Justice's religion and nominating President's political party, and the number of times they delivered a Supreme Court opinion. If one selects one or multiple political parties from the drop-down, a chart displaying the frequency of topics ruled upon by Justices nominated within the respective political parties will appear. Finally, selection of one or multiple Justice religions from the drop-down will generate a plot showing the frequency of topic opinions provided by Justices from those particular religions.
 
 In the final tab, 'Birth Region and Family's Socioeconomic Status', the top plot displays the number of Justices originating from certain U.S. region and socioeconomic status combinations. The bottom graph is controlled by the Birth Region and Family's Socioeconomic Status drop-down menus, where the plot will display the number of opinions delivered by justices from the regions or socieconomic status combinations selected by the user.
 
@@ -133,7 +133,7 @@ renderPlot({
   ggplot(dat_subset) + 
     geom_bar(aes(x = name, fill = name)) + 
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
           axis.title = element_text(size = 15), legend.position = "none", panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.75, unit = "cm"), plot.title = element_text(hjust = 0.5, size = 16)) + 
     scale_y_continuous(limits = c(0, NA),expand = c(0,0)) + 
     labs(x = "Justice Delivering Opinion", y = "No. of Cases") +
@@ -200,7 +200,7 @@ renderPlot({
   
   ggplot(melted_df) + 
     geom_col(aes(x = topic, y = percent, fill = name), position = "dodge") + 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
+    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
           legend.position = "bottom", panel.background = element_blank(), axis.line = element_line(), axis.title = element_text(size = 15),
           panel.grid.major.y = element_line(color = "grey90")) +
     scale_y_continuous(limits = c(NA,NA),expand = c(0,0)) +
@@ -248,7 +248,7 @@ renderPlot({
     scale_alpha_manual("Nominating President's Party", values=c(0.4, 1)) +
     guides(fill = guide_legend(title = "Justice's Religion"), color = FALSE) + 
     labs(x = "Justice", y = "% Times Justice Delivered Opinion*",
-         caption = "Justices restricted to those nominated by Republican or Democratic presidents in the modern political era (1933 - 2015).\n*Number of times justice delivered opinion divided by total number of cases seen by court during justice's term, multiplied by 100.\n**Justice Harlan Fiske Stone served twice, once nominated by a republican and once by a democrat.")
+         caption = "Justices restricted to those nominated by Republican or Democratic presidents in the modern political era (1933 - 2015).\n*Number of times justice delivered opinion divided by total number of cases seen by court during justice's term, multiplied by 100.\n**Justice Harlan Fiske Stone served twice, once nominated by a Republican and once by a Democrat.")
 })
 ```
 
@@ -382,7 +382,7 @@ renderPlot({
   )
   
   labels <- labs(y = "Number of Opinions Written", x = "Topic", caption = "Data represent raw counts and are not normalized for the number of total opinions written on a particular topic through the court's history.")
-  my_theme <- theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), legend.position = c(1, 1), legend.justification = c(1, 1))
+  my_theme <- theme(axis.text.x = element_text(size = 10, angle = 90, hjust = 0.95, vjust = 0.2), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), legend.position = c(1, 1), legend.justification = c(1, 1))
   
   if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
   
