@@ -22,12 +22,13 @@ library(magrittr)
 library(dplyr)
 library(stringr)
 library(DT)
+library(reshape2)
 
 dat <- readRDS("full.rds")
 dat_sub <- readRDS("full_subset.rds")
 
 topic_list <- unique(dat$topic)[order(unique(dat$topic))]
-justice_list <- unique(dat$name)
+justice_list <- unique(dat$name)[order(unique(dat$name))]
 party_list <- unique(dat_sub$pres_party)
 religion_list <- unique(dat_sub$religion)
 dat$term <- dat$yrend - dat$yrnom
@@ -86,7 +87,7 @@ The 'By Political Party and Religion' tab contains three possible graphs. The to
 
 In the final tab, 'Birth Region and Family's Socioeconomic Status', the top plot displays the number of Justices originating from certain U.S. region and socioeconomic status combinations. The bottom graph is controlled by the Birth Region and Family's Socioeconomic Status drop-down menus, where the plot will display the number of opinions delivered by justices from the regions or socieconomic status combinations selected by the user.
 
-We hope you have a **Supreme-ly** good time using our App!
+We hope you have a *Supreme-ly* good time using our App!
 
 By Topic
 =======================================================================
@@ -107,9 +108,10 @@ Row
 renderPlot({
   ggplot(dat) + 
     geom_bar(aes(x = reorder(topic, -table(topic)[topic]))) + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
-          axis.title = element_text(size = 15)) + 
-    scale_y_continuous(expand = c(0,5)) + 
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2), axis.text = element_text(size = 11), 
+          axis.title = element_text(size = 15), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) + 
+    scale_y_continuous(limits = c(NA, 190), expand = c(0,0)) + 
     labs(x = "Topic", y = "No. Cases")
 })
 ```
@@ -120,8 +122,7 @@ Row
 
 ```{r}
 renderPlot({
-  req(!is.null(input$topic))
-  
+
   dat_subset <- dat[dat$topic == input$topic, c("name","topic")]
   
   palette = scale_fill_brewer(palette = "Set1")
@@ -131,8 +132,9 @@ renderPlot({
 
   ggplot(dat_subset) + 
     geom_bar(aes(x = name, fill = name)) + 
+    theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
-          axis.title = element_text(size = 15), legend.position = "none", plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.75, unit = "cm"), plot.title = element_text(hjust = 0.5, size = 16)) + 
+          axis.title = element_text(size = 15), legend.position = "none", panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.75, unit = "cm"), plot.title = element_text(hjust = 0.5, size = 16)) + 
     scale_y_continuous(limits = c(0, NA),expand = c(0,0)) + 
     labs(x = "Justice Delivering Opinion", y = "No. of Cases") +
     ggtitle(str_to_title(input$topic)) +
@@ -169,9 +171,10 @@ Row
 renderPlot({
   ggplot(dat) + 
     geom_bar(aes(x = reorder(name, datenom))) + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
-          axis.title = element_text(size = 13)) + 
-    scale_y_continuous(expand = c(0,5)) + 
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
+          axis.title = element_text(size = 13), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.75, unit = "cm")) + 
+    scale_y_continuous(limits = c(NA, 190), expand = c(0,0)) + 
     labs(x = "Justice", y = "No. Times Justice Delivered Opinion",
          caption = "Justices ordered by date of nomination (or recess appointment), through 1993.")
 })
@@ -225,10 +228,8 @@ Row
 -----------------------------------------------------------------------
 
 ```{r}
-# Normalize by # of cases the justice saw
-
 dat_sub$Party <- dat_sub$pres_party
-dat_sub[dat_sub$name == "Stone, Harlan Fiske", "Party"] <- "Both"
+dat_sub[dat_sub$name == "Stone, Harlan Fiske", "Party"] <- "Republican"
 renderPlot({
   melted_df <- as.data.frame(table(dat_sub$name))
   tmp <- unique(dat[,c("name","total_cases_seen")])
@@ -236,17 +237,18 @@ renderPlot({
   melted_df$percent <- round(melted_df$Freq / melted_df$total_cases_seen, 4)*100
   tmp <- merge(dat_sub, melted_df, by.x = "name", by.y = "Var1")
   tmp <- unique(tmp[,c("name","percent","religion","Party")])
-  
+  tmp[tmp$name == "Stone, Harlan Fiske", "name"] <- "Stone, Harlan Fiske**"
   
   ggplot(tmp) + 
-    geom_col(aes(x = name, y = percent, fill = religion, alpha = Party)) + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.2), axis.text = element_text(size = 11), 
-          axis.title = element_text(size = 15), legend.position = "top") + 
-    scale_y_continuous(expand = c(0,5)) + 
-    scale_alpha_manual(values=c(0.4, 0.7, 1), limits = c("Democrat", "Both", "Republican")) +
-    guides(fill = guide_legend(title = "Justice's Religion")) + 
+    geom_col(aes(x = name, y = percent, fill = religion, color = religion, alpha = Party)) + 
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text = element_text(size = 11), 
+          axis.title = element_text(size = 15), legend.position = "top", panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.75, unit = "cm")) + 
+    scale_y_continuous(limits = c(NA, 45), expand = c(0,0)) + 
+    scale_alpha_manual("Nominating President's Party", values=c(0.4, 1)) +
+    guides(fill = guide_legend(title = "Justice's Religion"), color = FALSE) + 
     labs(x = "Justice", y = "% Times Justice Delivered Opinion*",
-         caption = "Justices restricted to those nominated by Republican or Democratic presidents in the modern political era (1933 - 2015).\n*Number of times justice delivered opinion divided by total number of cases seen by court during justice's term, multiplied by 100.")
+         caption = "Justices restricted to those nominated by Republican or Democratic presidents in the modern political era (1933 - 2015).\n*Number of times justice delivered opinion divided by total number of cases seen by court during justice's term, multiplied by 100.\n**Justice Harlan Fiske Stone served twice, once nominated by a republican and once by a democrat.")
 })
 ```
 
@@ -318,10 +320,18 @@ Row
 
 ```{r}
 renderPlot({
-unique_justices_dat<- dat[!duplicated(dat$name),] 
 
-plot<-ggplot(unique_justices_dat%>% count(region,famses), aes(region,n,fill=famses))
-plot+geom_bar(position="dodge",stat="identity")+labs(y="Number of Justices",x="Region of Birth")+guides(fill=guide_legend(title="Family's Socioeconomic Status"))
+melted_df <- melt(table(dat[!duplicated(dat$name),"region"], dat[!duplicated(dat$name),"famses"]))
+names(melted_df) <- c("region", "famses", "value")
+melted_df[melted_df$value == 0, "value"] <- 0.1
+
+ggplot(melted_df, aes(x = region, y = value, fill = famses), width = 0.75) +
+  geom_col(position = "dodge") +
+  labs(y = "Number of Justices", x = "Region of Birth") +
+  guides(fill = guide_legend(title = "Family's Socioeconomic Status")) +
+  scale_y_continuous(limits = c(NA, 21), expand = c(0, 0)) +
+  theme_bw() +
+  theme(panel.grid.major.x = element_blank(), legend.position = c(1, 1), legend.justification = c(1, 1), axis.text.x = element_text(size = 12), axis.title = element_text(size = 14))
 
 })
 ```
@@ -331,24 +341,49 @@ Row
 
 ```{r}
 renderPlot({
+  req(!is.null(input$Birth_Region) | !is.null(input$Family_Socioeconomic_Status))
+  
+  labels <- labs(y = "Number of Opinions Written", x = "Topic", caption = "Data represent raw counts and are not normalized for the number of total opinions written on a particular topic through the court's history.")
+  my_theme <- theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), legend.position = c(1, 1), legend.justification = c(1, 1))
+  
  if(!is.null(input$Birth_Region) & is.null(input$Family_Socioeconomic_Status)){
-  
 
-  dat_subset <- dat[dat$region %in% c(input$Birth_Region),]
+  dat_subset <- dat[dat$region %in% c(input$Birth_Region),] %>% count(topic,famses)
+  upper <- max(dat[dat$region %in% c(input$Birth_Region),] %>% count(topic) %>% select(n) + 1)
   
-  ggplot(dat_subset %>% count(topic,famses),aes(topic,n,fill=famses))+geom_bar(stat="identity")+labs(y="Number of opinions written",x="Topic",caption="Data represent raw counts and are not normalized for the number of total opinions written on a particular topic through the court's history.")+guides(fill=guide_legend(title="Family's Socioeconomic Status"))+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
-  
+  ggplot(dat_subset, aes(x = topic, y = n, fill = famses)) + 
+    geom_bar(stat = "identity") +
+    guides(fill = guide_legend(title = "Family's Socioeconomic Status")) +
+    theme_bw() +
+    labels +
+    my_theme +
+    scale_y_continuous(limits = c(NA, upper), expand = c(0,0))
+      
  }else if (is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
-   dat_subset_1<- dat[dat$famses %in% c(input$Family_Socioeconomic_Status),]
    
-   ggplot(dat_subset_1 %>% count(topic,region),aes(topic,n,fill=region))+geom_bar(
-    stat="identity")+labs(y="Number of opinions written",x="Topic",caption="data represent raw counts and are not normalized for the number of total opinions written on a particular topic through the court's history")+guides(fill=guide_legend(title="Region of Birth"))+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.8))
+   dat_subset_1<- dat[dat$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic,region)
+   upper <- max(dat[dat$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic) %>% select(n) + 1)
+   
+   ggplot(dat_subset_1, aes(x = topic, y = n, fill = region)) + 
+     geom_bar(stat = "identity") +
+     guides(fill = guide_legend(title = "Region of Birth")) +
+     theme_bw() +
+     labels +
+     my_theme +
+     scale_y_continuous(limits = c(NA, upper), expand = c(0,0))
+
  }else if (!is.null(input$Birth_Region) & !is.null(input$Family_Socioeconomic_Status)){
    
    dat_subset_2<- dat[dat$region %in% c(input$Birth_Region),]
-   dat_subset_3<- dat_subset_2[dat_subset_2$famses %in% c(input$Family_Socioeconomic_Status),]
+   dat_subset_3<- dat_subset_2[dat_subset_2$famses %in% c(input$Family_Socioeconomic_Status),] %>% count(topic)
+   upper <- max(dat_subset_3$n) + 1
    
-   ggplot(dat_subset_3 %>% count(topic),aes(topic,n))+geom_bar(stat="identity")+labs(y="Number of opinions written",x="Topic",caption="data represent raw counts and are not normalized for the number of total opinions written on a particular topic through the court's history")+theme(axis.text.x = element_text(size=5,angle = 45, hjust = 1),legend.position=c(0.9,0.85))
+   ggplot(dat_subset_3, aes(x = topic, y = n)) +
+     geom_bar(stat = "identity") +
+     theme_bw() +
+     labels +
+     my_theme +
+     scale_y_continuous(limits = c(NA, upper), expand = c(0,0))
  }
 })
 ```
